@@ -95,6 +95,9 @@ and this class is not supported in data.table:
 ***episodes*** solves this with the `merge_episodes()` function:
 
 ```{r}
+merge_episodes(big_dat)
+
+# And for comparison with earlier timings
 system.time(
     big_dat |> 
         merge_episodes() |> 
@@ -102,7 +105,6 @@ system.time(
         out2
 )
 
-# check for equality
 all.equal(out, select(out2, id, interval))
 ```
 
