@@ -82,10 +82,10 @@ system.time(
 )
 ```
 
-If you were not already using it this is likely the time you would reach for 
-data.table. Unfortunately the interval class create by ivs is built upon on the
-[record type from vctrs](https://vctrs.r-lib.org/reference/new_rcrd.html) and
-these are not supported in data.table:
+If you were not already using it, this is likely the time you would reach for
+the data.table package. Unfortunately the interval class created by ivs is built
+upon on the [record type from vctrs](https://vctrs.r-lib.org/reference/new_rcrd.html),
+and this class is not supported in data.table:
 
 ```{r, error=TRUE}
     DT <- as.data.table(big_dat)
