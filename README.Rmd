@@ -1,0 +1,114 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+if (!requireNamespace("dplyr", quietly = TRUE)) {
+  warning(call. = FALSE, "This vignette requires dplyr.")
+  knitr::knit_exit()
+}
+
+if (!requireNamespace("ivs", quietly = TRUE)) {
+  warning(call. = FALSE, "This vignette requires dplyr.")
+  knitr::knit_exit()
+}
+
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# Motivation
+
+<!-- badges: start -->
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+<!-- badges: end -->
+
+***episodes*** is a (hopefully) temporary solution to a small inconvenience
+that relates to [data.table](https://cran.r-project.org/package=data.table),
+[dplyr](https://cran.r-project.org/package=dplyr) and
+[ivs](https://cran.r-project.org/package=ivs); namely that dplyr is currently
+[slow when working with a large number of groupings](https://github.com/tidyverse/dplyr/issues/5017)
+and data.table [does not support the record class](https://github.com/Rdatatable/data.table/issues/4910)
+on which ivs intervals are based.
+
+To expand on issues consider the following small set of episode data:
+
+```{r, message=FALSE}
+library(episodes)
+library(dplyr)
+library(ivs)
+library(data.table)
+
+id1 = c(1,1,2,2,2,1)
+start1 = as.Date(c("2020-01-01", "2020-01-03","2020-04-01", "2020-04-15", "2020-04-17", "2020-05-01"))
+end1 = as.Date(c("2020-01-10", "2020-01-10", "2020-04-30", "2020-04-16", "2020-04-19", "2020-10-01"))
+(dat <- tibble(id=id1,start=start1,end=end1))
+```
+
+ivs provides an elegant way to find the minimum spanning interval across
+these episodes:
+
+```{r}
+dat |>
+    mutate(interval = iv(start, end + 1)) |>
+    group_by(id) |>
+    summarise(interval=iv_groups(interval, abutting = FALSE), .groups = "drop")
+```
+
+This is great when we only have a small number of ids to group by but is
+noticeably slow for a larger number:
+
+```{r}
+n=125000
+id2 <- sample(seq_len(n), size = n * 5, replace = TRUE)
+start2 <- as.Date("2020-01-01") + sample.int(365, size = n*5, replace = TRUE)
+end2 <- start2 + sample(1:100, size = n*5, replace = TRUE)
+(big_dat <- tibble(id=id2, start=start2,end=end2))
+
+system.time(
+    big_dat |>
+        mutate(interval = iv(start, end + 1)) |>
+        group_by(id) |>
+        summarise(interval=iv_groups(interval, abutting = FALSE), .groups = "drop") ->
+        out
+        
+)
+```
+
+If you were not already using it this is likely the time you would reach for 
+data.table. Unfortunately the interval class create by ivs is built upon on the
+[record type from vctrs](https://vctrs.r-lib.org/reference/new_rcrd.html) and
+these are not supported in data.table:
+
+```{r, error=TRUE}
+    DT <- as.data.table(big_dat)
+    DT[, interval:=iv(start, end+1)]
+```
+
+***episodes*** solves this with the `merge_episodes()` function:
+
+```{r}
+system.time(
+    big_dat |> 
+        merge_episodes() |> 
+        mutate(interval = iv(start = .episode_start, end = .episode_end + 1)) ->
+        out2
+)
+
+# check for equality
+all.equal(out, select(out2, id, interval))
+```
+
+We also provide another function `add_parent_interval()` that associates the
+the minimum spanning interval with each observation without reducing to the
+unique values:
+
+```{r}
+add_parent_interval(big_dat)
+```
