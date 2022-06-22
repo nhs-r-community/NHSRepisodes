@@ -4,3 +4,6 @@
 ^LICENSE\.md$
 ^episodes\.Rproj$
 ^\.github$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
