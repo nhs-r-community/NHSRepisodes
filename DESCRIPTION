@@ -1,13 +1,23 @@
-Package: episodes
-Title: What the Package Does (One Line, Title Case)
+Package: NHSRepisodes
+Title: Merge Overlapping Episode Intervals
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "First",
-           family = "Last",
-           role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+    c(
+      person(
+        given   = "Tim",
+        family  = "Taylor",
+        role    = "aut",
+        email   = "tim.taylor@hiddenelephants.co.uk", 
+        comment = c(ORCID = "0000-0002-8587-7113")
+      ),
+      person(
+        given   = "NHS",
+        family  = "R",
+        role    = "cre",
+        email   = "nhs.rcommunity@nhs.net" 
+      )
+    )
+Description: Merge overlapping episode intervals.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
