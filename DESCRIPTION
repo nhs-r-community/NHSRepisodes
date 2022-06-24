@@ -1,23 +1,12 @@
 Package: NHSRepisodes
-Title: Merge Overlapping Episode Intervals
+Title: Package relating to Hospital Episode Intervals
 Version: 0.0.0.9000
 Authors@R: 
-    c(
-      person(
-        given   = "Tim",
-        family  = "Taylor",
-        role    = "aut",
-        email   = "tim.taylor@hiddenelephants.co.uk", 
-        comment = c(ORCID = "0000-0002-8587-7113")
-      ),
-      person(
-        given   = "NHS",
-        family  = "R",
-        role    = "cre",
-        email   = "nhs.rcommunity@nhs.net" 
-      )
-    )
-Description: Merge overlapping episode intervals.
+    c(person("Zoë", "Turner", role = c("aut", "cre"), email = "zoe.turner2@nottshc.nhs.uk", comment = c(ORCID = "0000-0003-1033-9158")),
+      person("Tim", "Taylor", "aut", email = "tim.taylor@hiddenelephants.co.uk", comment = c(ORCID = "0000-0002-8587-7113")),
+      person("NHS", "R", "cph"))
+Description: Hospital episodes can overlap or have gaps which can result in under or over counting.
+    This package contains functions which can be used to rectify this common analytical issue in NHS data.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

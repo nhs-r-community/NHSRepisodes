@@ -4,16 +4,17 @@
 \name{NHSRepisodes-package}
 \alias{NHSRepisodes}
 \alias{NHSRepisodes-package}
-\title{NHSRepisodes: Merge Overlapping Episode Intervals}
+\title{NHSRepisodes: Package relating to Hospital Episode Intervals}
 \description{
-Merge overlapping episode intervals.
+Hospital episodes can overlap or have gaps which can result in under or over counting. This package contains functions which can be used to rectify this common analytical issue in NHS data.
 }
 \author{
-\strong{Maintainer}: NHS R \email{nhs.rcommunity@nhs.net}
+\strong{Maintainer}: Zoë Turner \email{zoe.turner2@nottshc.nhs.uk} (\href{https://orcid.org/0000-0003-1033-9158}{ORCID})
 
-Authors:
+Other contributors:
 \itemize{
-  \item Tim Taylor \email{tim.taylor@hiddenelephants.co.uk} (\href{https://orcid.org/0000-0002-8587-7113}{ORCID})
+  \item Tim aut Taylor \email{tim.taylor@hiddenelephants.co.uk} (\href{https://orcid.org/0000-0002-8587-7113}{ORCID})
+  \item NHS cph R
 }
 
 }
