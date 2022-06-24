@@ -23,14 +23,14 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Episodes
+# NHSRepisodes
 
 <!-- badges: start -->
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![R-CMD-check](https://github.com/TimTaylor/episodes/workflows/R-CMD-check/badge.svg)](https://github.com/TimTaylor/episodes/actions)
+[![R-CMD-check](https://github.com/nhs-r-community/NHSRepisodes/workflows/R-CMD-check/badge.svg)](https://github.com/nhs-r-community/NHSRepisodes/actions)
 <!-- badges: end -->
 
-***episodes*** is a (hopefully) temporary solution to a small inconvenience
+***NHSRepisodes*** is a (hopefully) temporary solution to a small inconvenience
 that relates to [data.table](https://cran.r-project.org/package=data.table),
 [dplyr](https://cran.r-project.org/package=dplyr) and
 [ivs](https://cran.r-project.org/package=ivs); namely that dplyr is currently
@@ -92,7 +92,7 @@ and this class is not supported in data.table:
     DT[, interval:=iv(start, end+1)]
 ```
 
-***episodes*** solves this with the `merge_episodes()` function:
+***NHSRepisodes*** solves this with the `merge_episodes()` function:
 
 ```{r}
 merge_episodes(big_dat)

@@ -8,5 +8,5 @@
 NULL
 
 #' @import data.table
-#' @useDynLib episodes, .registration = TRUE
+#' @useDynLib NHSRepisodes, .registration = TRUE
 NULL
