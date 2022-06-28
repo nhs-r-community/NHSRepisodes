@@ -52,9 +52,7 @@ merge_episodes.default <- function(x, ...) {
 #' @rdname merge_episodes
 #' @export
 merge_episodes.data.table <- function(x, id = "id", start = "start", end = "end", ...) {
-    . <- .parent_start <- .parent_end <- NULL # for CRAN package checks
-    DT <- add_parent_interval(x, id=id, start=start, end = end)
-    DT[, .(.episode_start=min(.parent_start), .episode_end=max(.parent_end)), by = c(id, ".interval_number")]
+    .merge_episodes(x, id=id, start=start, end = end)
 }
 
 #' @rdname merge_episodes
@@ -62,15 +60,22 @@ merge_episodes.data.table <- function(x, id = "id", start = "start", end = "end"
 merge_episodes.tbl_df <- function(x, id = "id", start = "start", end = "end", ...) {
     if (!requireNamespace("tibble"))
         cli_abort("{.pkg tibble} is required to use this function. Please install to continue.")
-    x <- as.data.table(x)
-    x=merge_episodes.data.table(x, id=id, start=start, end=end)
-    tibble::as_tibble(setDF(x))
+    DT <- .merge_episodes(x, id=id, start=start, end = end)
+    tibble::as_tibble(setDF(DT))
 }
 
 #' @rdname merge_episodes
 #' @export
 merge_episodes.data.frame <- function(x, id = "id", start = "start", end = "end", ...) {
-    x <- as.data.table(x)
-    x=merge_episodes.data.table(x, id=id, start=start, end=end)
-    as.data.frame(x)
+    DT <- .merge_episodes(x, id=id, start=start, end = end)
+    as.data.frame(DT)
+}
+
+# -------------------------------------------------------------------------
+# internals ---------------------------------------------------------------
+# -------------------------------------------------------------------------
+.merge_episodes <- function(x, id, start, end) {
+    . <- .parent_start <- .parent_end <- NULL # for CRAN package checks
+    DT <- .add_parent_interval(x, id=id, start=start, end = end, call = caller_env())
+    DT[, .(.episode_start=min(.parent_start), .episode_end=max(.parent_end)), by = c(id, ".interval_number")]
 }

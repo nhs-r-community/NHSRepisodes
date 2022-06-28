@@ -75,7 +75,7 @@ add_parent_interval.data.frame <- function(x, id = "id", start = "start", end = 
 # -------------------------------------------------------------------------
 # internals ---------------------------------------------------------------
 # -------------------------------------------------------------------------
-.add_parent_interval <- function(x, id, start, end) {
+.add_parent_interval <- function(x, id, start, end, call = caller_env()) {
 
     # check specified columns are present
     nms <- names(x)
@@ -85,7 +85,7 @@ add_parent_interval.data.frame <- function(x, id = "id", start = "start", end = 
         v <- vars[!present][1]
         cli_abort(
             "{.val {v}} is not a column in {.arg x}",
-            call = caller_env()
+            call = call
         )
     }
 
@@ -99,7 +99,7 @@ add_parent_interval.data.frame <- function(x, id = "id", start = "start", end = 
     if (start_cond || end_cond || i_cond) {
         cli_abort(
             "{.arg start} and {.arg end} columns must both be either {.cls Date} or {.cls POSIXct}.",
-            call = caller_env()
+            call = call
         )
     }
 
