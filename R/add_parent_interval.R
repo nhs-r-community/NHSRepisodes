@@ -58,6 +58,8 @@ add_parent_interval.data.table <- function(x, id = "id", start = "start", end = 
 #' @rdname add_parent_interval
 #' @export
 add_parent_interval.tbl_df <- function(x, id = "id", start = "start", end = "end", ...) {
+    if (!requireNamespace("tibble"))
+        cli_abort("{.pkg tibble} is required to use this function. Please install to continue.")
     out <- .add_parent_interval(x, id = id, start = start, end = end)
     tibble::as_tibble(setDF(out))
 }
