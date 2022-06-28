@@ -50,52 +50,57 @@ add_parent_interval.default <- function(x, ...) {
 #' @rdname add_parent_interval
 #' @export
 add_parent_interval.data.table <- function(x, id = "id", start = "start", end = "end", ...) {
-    .validate_inputs(x = x, id = id, start = start, end = end)
-    vec_id <- .subset2(x, id)
-    start <- .subset2(x, start)
-    end <- .subset2(x, end)
-    out <- .add_parent_interval(vec_id,start,end)
-    setnames(out, old = "id", new = id)
+    .add_parent_interval(x, id = id, start = start, end = end)
 }
 
 #' @rdname add_parent_interval
 #' @export
 add_parent_interval.tbl_df <- function(x, id = "id", start = "start", end = "end", ...) {
-    x <- as.data.table(x)
-    x <- add_parent_interval.data.table(x, id=id, start=start, end=end)
-    tibble::as_tibble(setDF(x))
+    out <- .add_parent_interval(x, id = id, start = start, end = end)
+    tibble::as_tibble(setDF(out))
 }
 
 #' @rdname add_parent_interval
 #' @export
 add_parent_interval.data.frame <- function(x, id = "id", start = "start", end = "end", ...) {
-    x <- as.data.table(x)
-    x <- add_parent_interval.data.table(x, id=id, start=start, end=end)
-    as.data.frame(x)
+    out <- .add_parent_interval(x, id = id, start = start, end = end)
+    as.data.frame(out)
 }
 
 
 # -------------------------------------------------------------------------
 # internals ---------------------------------------------------------------
 # -------------------------------------------------------------------------
-.validate_inputs <- function(x, id, start, end) {
+.add_parent_interval <- function(x, id, start, end) {
+
+    # check specified columns are present
     nms <- names(x)
     vars <- c(id, start, end)
     present <- vars %in% nms
-    if (any(!present))
-        stop(sprintf("'%s' is not a column in `x`", vars[!present][1]), call. = FALSE)
-    s <- .subset2(x, start)
-    e <- .subset2(x, end)
-    if (!identical(class(s), class(e)))
-        stop("`start` and `end` must be the same class")
-    invisible(x)
-}
+    if (any(!present)) {
+        msg <- sprintf("'%s' is not a column in `x`", vars[!present][1])
+        call <- sys.call(-1L)[1]
+        stop(simpleError(msg, call))
+    }
 
-.add_parent_interval <- function(id, start, end) {
-    DT <- as.data.table(list(id=id, start=start, end=end))
+    # check start and end are of a valid and identical class
+    vec_start <- .subset2(x, start)
+    vec_end <- .subset2(x, end)
+
+    start_cond <- !inherits(vec_start, "Date") && !inherits(vec_start, "POSIXct")
+    end_cond <- !inherits(vec_end, "Date") && !inherits(vec_end, "POSIXct")
+    i_cond <- !identical(class(vec_start), class(vec_end))
+    if (start_cond || end_cond || i_cond) {
+        msg <- "`start` and `end` must both be of identical class and either <Date> or <POSIXct>."
+        call <- sys.call(-1L)[1]
+        stop(simpleError(msg, call))
+    }
+
+    vec_id <- .subset2(x, id)
+    DT <- as.data.table(list(id=vec_id, start=vec_start, end=vec_end))
     setorder(DT, id, start)
     DT <- DT[,c(".parent_start", ".parent_end", ".interval_number") := .calculate_parent(start, end), keyby = id]
-    DT[]
+    setnames(DT, old = "id", new = id)
 }
 
 .calculate_parent <- function(start, end) {
