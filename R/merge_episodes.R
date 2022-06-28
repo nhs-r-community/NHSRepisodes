@@ -46,7 +46,7 @@ merge_episodes <- function(x, ...) {
 #' @rdname merge_episodes
 #' @export
 merge_episodes.default <- function(x, ...) {
-    stop(sprintf("Not implemented for class [%s].", paste(class(x), collapse = ", ")))
+    cli_abort("Not implemented for {.cls {class(x)}} objects.")
 }
 
 #' @rdname merge_episodes
@@ -61,7 +61,7 @@ merge_episodes.data.table <- function(x, id = "id", start = "start", end = "end"
 #' @export
 merge_episodes.tbl_df <- function(x, id = "id", start = "start", end = "end", ...) {
     if (!requireNamespace("tibble"))
-        stop("The {tibble} package is required to use this function. Please install to continue.")
+        cli_abort("{.pkg tibble} is required to use this function. Please install to continue.")
     x <- as.data.table(x)
     x=merge_episodes.data.table(x, id=id, start=start, end=end)
     tibble::as_tibble(setDF(x))

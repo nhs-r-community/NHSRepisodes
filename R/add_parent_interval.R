@@ -46,7 +46,7 @@ add_parent_interval <- function(x, id = "id", start = "start", end = "end", ...)
 #' @rdname add_parent_interval
 #' @export
 add_parent_interval.default <- function(x, ...) {
-    stop(sprintf("Not implemented for class [%s].", paste(class(x), collapse = ", ")))
+    cli_abort("Not implemented for {.cls {class(x)}} objects.")
 }
 
 #' @rdname add_parent_interval
@@ -80,9 +80,11 @@ add_parent_interval.data.frame <- function(x, id = "id", start = "start", end = 
     vars <- c(id, start, end)
     present <- vars %in% nms
     if (any(!present)) {
-        msg <- sprintf("'%s' is not a column in `x`", vars[!present][1])
-        call <- sys.call(-1L)[1]
-        stop(simpleError(msg, call))
+        v <- vars[!present][1]
+        cli_abort(
+            "{.val {v}} is not a column in {.arg x}",
+            call = caller_env()
+        )
     }
 
     # check start and end are of a valid and identical class
@@ -93,9 +95,10 @@ add_parent_interval.data.frame <- function(x, id = "id", start = "start", end = 
     end_cond <- !inherits(vec_end, "Date") && !inherits(vec_end, "POSIXct")
     i_cond <- !identical(class(vec_start), class(vec_end))
     if (start_cond || end_cond || i_cond) {
-        msg <- "`start` and `end` must both be of identical class and either <Date> or <POSIXct>."
-        call <- sys.call(-1L)[1]
-        stop(simpleError(msg, call))
+        cli_abort(
+            "{.arg start} and {.arg end} columns must both be either {.cls Date} or {.cls POSIXct}.",
+            call = caller_env()
+        )
     }
 
     vec_id <- .subset2(x, id)

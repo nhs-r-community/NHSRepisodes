@@ -8,5 +8,7 @@
 NULL
 
 #' @import data.table
+#' @importFrom cli cli_abort
+#' @importFrom rlang caller_env
 #' @useDynLib NHSRepisodes, .registration = TRUE
 NULL
