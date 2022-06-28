@@ -12,10 +12,12 @@
 #' Variable in `x` representing the id associated with the episode.
 #'
 #' @param start `[character]`
-#' Variable in `x` representing the start of the episode.
+#' Variable in `x` representing the start of the episode. Must refer to a
+#' variable that is either class `<Date>` or `<POSIXct>`.
 #'
 #' @param end `[character]`
-#' Variable in `x` representing the start of the episode.
+#' Variable in `x` representing the start of the episode. Must refer to a
+#' variable that is the same class as `start`.
 #'
 #' @param ...
 #' Not currently used.

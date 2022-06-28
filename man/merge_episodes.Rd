@@ -27,10 +27,12 @@ merge_episodes(x, ...)
 Variable in \code{x} representing the id associated with the episode.}
 
 \item{start}{\verb{[character]}
-Variable in \code{x} representing the start of the episode.}
+Variable in \code{x} representing the start of the episode. Must refer to a
+variable that is either class \verb{<Date>} or \verb{<POSIXct>}.}
 
 \item{end}{\verb{[character]}
-Variable in \code{x} representing the start of the episode.}
+Variable in \code{x} representing the start of the episode. Must refer to a
+variable that is the same class as \code{start}.}
 }
 \value{
 The resulting combined episode intervals split by id and interval number. The

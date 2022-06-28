@@ -25,10 +25,12 @@ add_parent_interval(x, id = "id", start = "start", end = "end", ...)
 Variable in \code{x} representing the id associated with an episode.}
 
 \item{start}{\verb{[character]}
-Variable in \code{x} representing the start of the episode.}
+Variable in \code{x} representing the start of the episode. Must refer to a
+variable that is either class \verb{<Date>} or \verb{<POSIXct>}.}
 
 \item{end}{\verb{[character]}
-Variable in \code{x} representing the start of the episode.}
+Variable in \code{x} representing the start of the episode. Must refer to a
+variable that is the same class as \code{start}.}
 
 \item{...}{Not currently used.}
 }

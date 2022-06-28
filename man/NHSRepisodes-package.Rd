@@ -11,10 +11,14 @@ Hospital episodes can overlap or have gaps which can result in under or over cou
 \author{
 \strong{Maintainer}: Zoë Turner \email{zoe.turner2@nottshc.nhs.uk} (\href{https://orcid.org/0000-0003-1033-9158}{ORCID})
 
+Authors:
+\itemize{
+  \item Tim Taylor \email{tim.taylor@hiddenelephants.co.uk} (\href{https://orcid.org/0000-0002-8587-7113}{ORCID})
+}
+
 Other contributors:
 \itemize{
-  \item Tim aut Taylor \email{tim.taylor@hiddenelephants.co.uk} (\href{https://orcid.org/0000-0002-8587-7113}{ORCID})
-  \item NHS cph R
+  \item NHS R [copyright holder]
 }
 
 }
