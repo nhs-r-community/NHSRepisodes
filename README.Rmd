@@ -47,13 +47,14 @@ library(ivs)
 library(data.table)
 
 # note - we need functionality introduced in dplyr 1.1.0.
-if (getNamespaceVersion("dplyr") < "1.1.0")
-    stop("Please update dplyr to version 1.1.0 or higher to run these examples.")
+if (getNamespaceVersion("dplyr") < "1.1.0") {
+  stop("Please update dplyr to version 1.1.0 or higher to run these examples.")
+}
 
-id1 = c(1,1,2,2,2,1)
-start1 = as.Date(c("2020-01-01", "2020-01-03","2020-04-01", "2020-04-15", "2020-04-17", "2020-05-01"))
-end1 = as.Date(c("2020-01-10", "2020-01-10", "2020-04-30", "2020-04-16", "2020-04-19", "2020-10-01"))
-(dat <- tibble(id=id1,start=start1,end=end1))
+id1 <- c(1, 1, 2, 2, 2, 1)
+start1 <- as.Date(c("2020-01-01", "2020-01-03", "2020-04-01", "2020-04-15", "2020-04-17", "2020-05-01"))
+end1 <- as.Date(c("2020-01-10", "2020-01-10", "2020-04-30", "2020-04-16", "2020-04-19", "2020-10-01"))
+(dat <- tibble(id = id1, start = start1, end = end1))
 ```
 
 ivs provides an elegant way to find the minimum spanning interval across
@@ -61,26 +62,25 @@ these episodes:
 
 ```{r}
 dat |>
-    mutate(interval = iv(start, end + 1)) |>
-    reframe(interval = iv_groups(interval, abutting = FALSE), .by = id)
+  mutate(interval = iv(start, end + 1)) |>
+  reframe(interval = iv_groups(interval, abutting = FALSE), .by = id)
 ```
 
 This is great when we only have a small number of ids to group by but is
 noticeably slow for a larger number:
 
 ```{r}
-n=125000
+n <- 125000
 id2 <- sample(seq_len(n), size = n * 5, replace = TRUE)
-start2 <- as.Date("2020-01-01") + sample.int(365, size = n*5, replace = TRUE)
-end2 <- start2 + sample(1:100, size = n*5, replace = TRUE)
-(big_dat <- tibble(id=id2, start=start2,end=end2))
+start2 <- as.Date("2020-01-01") + sample.int(365, size = n * 5, replace = TRUE)
+end2 <- start2 + sample(1:100, size = n * 5, replace = TRUE)
+(big_dat <- tibble(id = id2, start = start2, end = end2))
 
 system.time(
-    big_dat |>
-        mutate(interval = iv(start, end + 1)) |>
-        reframe(interval = iv_groups(interval, abutting = FALSE), .by = id) ->
-        out
-        
+  big_dat |>
+    mutate(interval = iv(start, end + 1)) |>
+    reframe(interval = iv_groups(interval, abutting = FALSE), .by = id) ->
+  out
 )
 ```
 
@@ -90,8 +90,8 @@ upon on the [record type from vctrs](https://vctrs.r-lib.org/reference/new_rcrd.
 and this class is not supported in data.table:
 
 ```{r, error=TRUE}
-    DT <- as.data.table(big_dat)
-    DT[, interval:=iv(start, end+1)]
+DT <- as.data.table(big_dat)
+DT[, interval := iv(start, end + 1)]
 ```
 
 ***NHSRepisodes*** solves this with the `merge_episodes()` function:
@@ -101,10 +101,10 @@ merge_episodes(big_dat)
 
 # And for comparison with earlier timings
 system.time(
-    big_dat |> 
-        merge_episodes() |> 
-        mutate(interval = iv(start = .episode_start, end = .episode_end + 1)) ->
-        out2
+  big_dat |>
+    merge_episodes() |>
+    mutate(interval = iv(start = .episode_start, end = .episode_end + 1)) ->
+  out2
 )
 
 # equal output (subject to ordering)
