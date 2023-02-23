@@ -20,7 +20,7 @@ Description: Hospital episodes can overlap or have gaps which can result in
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.3
 Imports: 
     cli,
     data.table,

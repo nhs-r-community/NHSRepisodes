@@ -24,10 +24,14 @@ ivs intervals are based.
 To expand on issues consider the following small set of episode data:
 
 ``` r
-library(episodes)
+library(NHSRepisodes)
 library(dplyr)
 library(ivs)
 library(data.table)
+
+# note - we need functionality introduced in dplyr 1.1.0.
+if (getNamespaceVersion("dplyr") < "1.1.0")
+    stop("Please update dplyr to version 1.1.0 or higher to run these examples.")
 
 id1 = c(1,1,2,2,2,1)
 start1 = as.Date(c("2020-01-01", "2020-01-03","2020-04-01", "2020-04-15", "2020-04-17", "2020-05-01"))
@@ -50,8 +54,7 @@ these episodes:
 ``` r
 dat |>
     mutate(interval = iv(start, end + 1)) |>
-    group_by(id) |>
-    summarise(interval=iv_groups(interval, abutting = FALSE), .groups = "drop")
+    reframe(interval = iv_groups(interval, abutting = FALSE), .by = id)
 #> # A tibble: 3 × 2
 #>      id                 interval
 #>   <dbl>               <iv<date>>
@@ -72,28 +75,27 @@ end2 <- start2 + sample(1:100, size = n*5, replace = TRUE)
 #> # A tibble: 625,000 × 3
 #>        id start      end       
 #>     <int> <date>     <date>    
-#>  1  29443 2020-01-22 2020-03-02
-#>  2  67394 2020-12-29 2021-01-16
-#>  3  13998 2020-08-12 2020-08-13
-#>  4  67419 2020-02-07 2020-04-13
-#>  5  14394 2020-05-25 2020-08-06
-#>  6  32913 2020-06-09 2020-09-10
-#>  7 110736 2020-05-05 2020-07-09
-#>  8 105723 2020-10-29 2021-01-02
-#>  9  58685 2020-01-31 2020-04-02
-#> 10  49374 2020-08-25 2020-09-10
+#>  1 115303 2020-11-23 2021-02-20
+#>  2  15465 2020-07-15 2020-09-05
+#>  3  67221 2020-04-24 2020-07-23
+#>  4   2603 2020-10-26 2020-12-09
+#>  5  39753 2020-11-20 2021-01-05
+#>  6  12948 2020-02-10 2020-03-23
+#>  7  36370 2020-06-20 2020-08-18
+#>  8  31357 2020-06-28 2020-09-02
+#>  9  85851 2020-09-16 2020-10-30
+#> 10 106298 2020-12-17 2021-03-23
 #> # … with 624,990 more rows
 
 system.time(
     big_dat |>
         mutate(interval = iv(start, end + 1)) |>
-        group_by(id) |>
-        summarise(interval=iv_groups(interval, abutting = FALSE), .groups = "drop") ->
+        reframe(interval = iv_groups(interval, abutting = FALSE), .by = id) ->
         out
         
 )
 #>    user  system elapsed 
-#>  32.458   0.100  32.682
+#>  31.989   0.093  32.179
 ```
 
 If you were not already using it, this is likely the time you would
@@ -112,20 +114,20 @@ is not supported in data.table:
 
 ``` r
 merge_episodes(big_dat)
-#> # A tibble: 335,911 × 4
+#> # A tibble: 335,893 × 4
 #>       id .interval_number .episode_start .episode_end
 #>    <int>            <int> <date>         <date>      
-#>  1     1                1 2020-02-25     2020-05-31  
-#>  2     1                2 2020-10-27     2021-02-14  
-#>  3     2                1 2020-03-09     2020-03-31  
-#>  4     2                2 2020-07-14     2021-01-06  
-#>  5     3                1 2020-04-17     2020-12-09  
-#>  6     4                1 2020-01-21     2020-03-29  
-#>  7     4                2 2020-09-04     2020-11-23  
-#>  8     5                1 2020-03-07     2020-06-12  
-#>  9     5                2 2020-06-22     2020-09-08  
-#> 10     5                3 2020-12-16     2020-12-19  
-#> # … with 335,901 more rows
+#>  1     1                1 2020-03-08     2020-04-09  
+#>  2     1                2 2020-04-11     2020-07-20  
+#>  3     1                3 2020-08-11     2020-09-12  
+#>  4     1                4 2020-09-15     2021-01-11  
+#>  5     2                1 2020-01-21     2020-02-01  
+#>  6     2                2 2020-04-09     2020-07-22  
+#>  7     2                3 2020-09-21     2020-11-13  
+#>  8     3                1 2020-01-28     2020-04-30  
+#>  9     3                2 2020-06-04     2020-08-12  
+#> 10     3                3 2020-08-25     2020-10-06  
+#> # … with 335,883 more rows
 
 # And for comparison with earlier timings
 system.time(
@@ -135,9 +137,10 @@ system.time(
         out2
 )
 #>    user  system elapsed 
-#>   0.743   0.000   0.601
+#>   0.714   0.001   0.579
 
-all.equal(out, select(out2, id, interval))
+# equal output (subject to ordering)
+all.equal(arrange(out, id, interval), select(out2, id, interval))
 #> [1] TRUE
 ```
 
@@ -150,15 +153,15 @@ add_parent_interval(big_dat)
 #> # A tibble: 625,000 × 6
 #>       id start      end        .parent_start .parent_end .interval_number
 #>    <int> <date>     <date>     <date>        <date>                 <int>
-#>  1     1 2020-02-25 2020-05-31 2020-02-25    2020-05-31                 1
-#>  2     1 2020-03-25 2020-05-14 2020-02-25    2020-05-31                 1
-#>  3     1 2020-04-24 2020-05-12 2020-02-25    2020-05-31                 1
-#>  4     1 2020-10-27 2020-12-15 2020-10-27    2020-12-27                 2
-#>  5     1 2020-10-30 2020-12-27 2020-10-27    2021-02-14                 2
-#>  6     1 2020-12-26 2021-02-14 2020-10-27    2021-02-14                 2
-#>  7     2 2020-03-09 2020-03-31 2020-03-09    2020-03-31                 1
-#>  8     2 2020-07-14 2020-10-16 2020-07-14    2020-12-17                 2
-#>  9     2 2020-10-02 2020-12-17 2020-07-14    2021-01-06                 2
-#> 10     2 2020-10-25 2021-01-06 2020-07-14    2021-01-06                 2
+#>  1     1 2020-03-08 2020-04-09 2020-03-08    2020-04-09                 1
+#>  2     1 2020-04-11 2020-06-29 2020-04-11    2020-07-20                 2
+#>  3     1 2020-05-28 2020-07-20 2020-04-11    2020-07-20                 2
+#>  4     1 2020-08-11 2020-08-29 2020-08-11    2020-09-12                 3
+#>  5     1 2020-08-25 2020-09-12 2020-08-11    2020-09-12                 3
+#>  6     1 2020-09-15 2020-11-17 2020-09-15    2021-01-11                 4
+#>  7     1 2020-10-28 2021-01-11 2020-09-15    2021-01-11                 4
+#>  8     1 2020-11-23 2020-11-27 2020-09-15    2021-01-11                 4
+#>  9     2 2020-01-21 2020-02-01 2020-01-21    2020-02-01                 1
+#> 10     2 2020-04-09 2020-06-14 2020-04-09    2020-07-22                 2
 #> # … with 624,990 more rows
 ```

@@ -41,10 +41,14 @@ on which ivs intervals are based.
 To expand on issues consider the following small set of episode data:
 
 ```{r, message=FALSE}
-library(episodes)
+library(NHSRepisodes)
 library(dplyr)
 library(ivs)
 library(data.table)
+
+# note - we need functionality introduced in dplyr 1.1.0.
+if (getNamespaceVersion("dplyr") < "1.1.0")
+    stop("Please update dplyr to version 1.1.0 or higher to run these examples.")
 
 id1 = c(1,1,2,2,2,1)
 start1 = as.Date(c("2020-01-01", "2020-01-03","2020-04-01", "2020-04-15", "2020-04-17", "2020-05-01"))
@@ -58,8 +62,7 @@ these episodes:
 ```{r}
 dat |>
     mutate(interval = iv(start, end + 1)) |>
-    group_by(id) |>
-    summarise(interval=iv_groups(interval, abutting = FALSE), .groups = "drop")
+    reframe(interval = iv_groups(interval, abutting = FALSE), .by = id)
 ```
 
 This is great when we only have a small number of ids to group by but is
@@ -75,8 +78,7 @@ end2 <- start2 + sample(1:100, size = n*5, replace = TRUE)
 system.time(
     big_dat |>
         mutate(interval = iv(start, end + 1)) |>
-        group_by(id) |>
-        summarise(interval=iv_groups(interval, abutting = FALSE), .groups = "drop") ->
+        reframe(interval = iv_groups(interval, abutting = FALSE), .by = id) ->
         out
         
 )
@@ -105,7 +107,8 @@ system.time(
         out2
 )
 
-all.equal(out, select(out2, id, interval))
+# equal output (subject to ordering)
+all.equal(arrange(out, id, interval), select(out2, id, interval))
 ```
 
 We also provide another function `add_parent_interval()` that associates the
