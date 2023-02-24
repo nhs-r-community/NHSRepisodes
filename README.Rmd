@@ -47,19 +47,27 @@ library(ivs)
 library(data.table)
 
 # note - we need functionality introduced in dplyr 1.1.0.
-if (getNamespaceVersion("dplyr") < "1.1.0") {
-  stop("Please update dplyr to version 1.1.0 or higher to run these examples.")
-}
 
+if (getNamespaceVersion("dplyr") < "1.1.0")
+    stop("Please update dplyr to version 1.1.0 or higher to run these examples.")
+    
 # Create a dummy data set
 
-id1 <- c(1, 1, 2, 2, 2, 1)
-start1 <- as.Date(c("2020-01-01", "2020-01-03", "2020-04-01", "2020-04-15", "2020-04-17", "2020-05-01"))
-end1 <- as.Date(c("2020-01-10", "2020-01-10", "2020-04-30", "2020-04-16", "2020-04-19", "2020-10-01"))
+dat <- tribble(
+    ~id, ~start, ~end,
+    1L, "2020-01-01", "2020-01-10",
+    1L, "2020-01-03", "2020-01-10",
+    2L, "2020-04-01", "2020-04-30",
+    2L, "2020-04-15", "2020-04-16",
+    2L, "2020-04-17", "2020-04-19",
+    1L, "2020-05-01", "2020-10-01",
+    1L, "2020-01-01", "2020-01-10",
+    1L, "2020-01-11", "2020-01-12",
+)
 
 # This will create an object called dat and also open in the console
 
-(dat <- tibble(id = id1, start = start1, end = end1))
+(dat <- mutate(dat, across(start:end, as.Date)))
 ```
 
 The {ivs} package provides an elegant way to find the minimum spanning interval 
