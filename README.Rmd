@@ -49,11 +49,18 @@ library(data.table)
 # note - we need functionality introduced in dplyr 1.1.0.
 if (getNamespaceVersion("dplyr") < "1.1.0")
     stop("Please update dplyr to version 1.1.0 or higher to run these examples.")
-
-id1 = c(1,1,2,2,2,1)
-start1 = as.Date(c("2020-01-01", "2020-01-03","2020-04-01", "2020-04-15", "2020-04-17", "2020-05-01"))
-end1 = as.Date(c("2020-01-10", "2020-01-10", "2020-04-30", "2020-04-16", "2020-04-19", "2020-10-01"))
-(dat <- tibble(id=id1,start=start1,end=end1))
+dat <- tribble(
+    ~id, ~start, ~end,
+    1L, "2020-01-01", "2020-01-10",
+    1L, "2020-01-03", "2020-01-10",
+    2L, "2020-04-01", "2020-04-30",
+    2L, "2020-04-15", "2020-04-16",
+    2L, "2020-04-17", "2020-04-19",
+    1L, "2020-05-01", "2020-10-01",
+    1L, "2020-01-01", "2020-01-10",
+    1L, "2020-01-11", "2020-01-12",
+)
+(dat <- mutate(dat, across(start:end, as.Date)))
 ```
 
 ivs provides an elegant way to find the minimum spanning interval across
@@ -69,7 +76,7 @@ This is great when we only have a small number of ids to group by but is
 noticeably slow for a larger number:
 
 ```{r}
-n=125000
+n <- 125000
 id2 <- sample(seq_len(n), size = n * 5, replace = TRUE)
 start2 <- as.Date("2020-01-01") + sample.int(365, size = n*5, replace = TRUE)
 end2 <- start2 + sample(1:100, size = n*5, replace = TRUE)
