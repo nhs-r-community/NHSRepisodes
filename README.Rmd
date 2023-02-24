@@ -6,12 +6,12 @@ output: github_document
 
 ```{r, include = FALSE}
 if (!requireNamespace("dplyr", quietly = TRUE)) {
-  warning(call. = FALSE, "This vignette requires dplyr.")
+  warning(call. = FALSE, "This vignette requires dplyr >= v1.1.0.")
   knitr::knit_exit()
 }
 
 if (!requireNamespace("ivs", quietly = TRUE)) {
-  warning(call. = FALSE, "This vignette requires dplyr.")
+  warning(call. = FALSE, "This vignette requires dplyr >= v1.1.0.")
   knitr::knit_exit()
 }
 
@@ -51,43 +51,64 @@ if (getNamespaceVersion("dplyr") < "1.1.0") {
   stop("Please update dplyr to version 1.1.0 or higher to run these examples.")
 }
 
+# Create a dummy data set
+
 id1 <- c(1, 1, 2, 2, 2, 1)
 start1 <- as.Date(c("2020-01-01", "2020-01-03", "2020-04-01", "2020-04-15", "2020-04-17", "2020-05-01"))
 end1 <- as.Date(c("2020-01-10", "2020-01-10", "2020-04-30", "2020-04-16", "2020-04-19", "2020-10-01"))
+
+# This will create an object called dat and also open in the console
+
 (dat <- tibble(id = id1, start = start1, end = end1))
 ```
 
-ivs provides an elegant way to find the minimum spanning interval across
-these episodes:
+The {ivs} package provides an elegant way to find the minimum spanning interval 
+across these episodes:
 
 ```{r}
 dat |>
   mutate(interval = iv(start, end + 1)) |>
-  reframe(interval = iv_groups(interval, abutting = FALSE), .by = id)
+  reframe(interval = iv_groups(interval), .by = id)
 ```
+
+The intervals have an opening square bracket `[` as the start is inclusive whilst
+the end date has a rounded bracket `)` as it is exclusive. Consequently, the 
+first row where the dates are `2020-01-01` to `2020-01-10` would only count from
+`2020-01-01` to `2020-01-09` normally but as we want to count the full day (the
+10th) the column `interval` has an additional day added.
+
+The second change uses `reframe()` from {dplyr}, replacing the `summarise()` 
+function as the data frame returns more than one row which was deprecated in
+{dplyr} version 1.1.0.
 
 This is great when we only have a small number of ids to group by but is
 noticeably slow for a larger number:
 
 ```{r}
+# Creating a larger data set
+
 n <- 125000
 id2 <- sample(seq_len(n), size = n * 5, replace = TRUE)
 start2 <- as.Date("2020-01-01") + sample.int(365, size = n * 5, replace = TRUE)
 end2 <- start2 + sample(1:100, size = n * 5, replace = TRUE)
+
+# creates the object big_dat and shows the first 10 rows as a tibble in the console
+
 (big_dat <- tibble(id = id2, start = start2, end = end2))
 
+# checking the time to run
+
 system.time(
-  big_dat |>
+  out <- big_dat |>
     mutate(interval = iv(start, end + 1)) |>
-    reframe(interval = iv_groups(interval, abutting = FALSE), .by = id) ->
-  out
+    reframe(interval = iv_groups(interval), .by = id)
 )
 ```
 
 If you were not already using it, this is likely the time you would reach for
-the data.table package. Unfortunately the interval class created by ivs is built
-upon on the [record type from vctrs](https://vctrs.r-lib.org/reference/new_rcrd.html),
-and this class is not supported in data.table:
+the {data.table} package. Unfortunately the interval class created by {ivs} is 
+built upon on the [record type from vctrs](https://vctrs.r-lib.org/reference/new_rcrd.html),
+and this class is not supported in {data.table}:
 
 ```{r, error=TRUE}
 DT <- as.data.table(big_dat)
@@ -101,10 +122,9 @@ merge_episodes(big_dat)
 
 # And for comparison with earlier timings
 system.time(
-  big_dat |>
+  out2 <- big_dat |>
     merge_episodes() |>
-    mutate(interval = iv(start = .episode_start, end = .episode_end + 1)) ->
-  out2
+    mutate(interval = iv(start = .episode_start, end = .episode_end + 1))
 )
 
 # equal output (subject to ordering)
@@ -116,5 +136,5 @@ the minimum spanning interval with each observation without reducing to the
 unique values:
 
 ```{r}
-add_parent_interval(big_dat)
+add_parent_interval(dat)
 ```
