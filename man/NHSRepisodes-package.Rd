@@ -9,7 +9,7 @@
 Hospital episodes can overlap or have gaps which can result in under or over counting. This package contains functions which can be used to rectify this common analytical issue in NHS data.
 }
 \author{
-\strong{Maintainer}: Zoë Turner \email{zoe.turner2@nottshc.nhs.uk} (\href{https://orcid.org/0000-0003-1033-9158}{ORCID})
+\strong{Maintainer}: Zoë Turner \email{zoe.turner3@nhs.net} (\href{https://orcid.org/0000-0003-1033-9158}{ORCID})
 
 Authors:
 \itemize{

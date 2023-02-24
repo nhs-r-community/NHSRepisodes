@@ -43,36 +43,57 @@
 #' add_parent_interval(dat)
 #'
 #' @export
-add_parent_interval <- function(x, id = "id", start = "start", end = "end", ...) {
+add_parent_interval <- function(x, id = "id",
+                                start = "start",
+                                end = "end", ...) {
   UseMethod("add_parent_interval")
 }
 
 #' @rdname add_parent_interval
 #' @export
 add_parent_interval.default <- function(x, ...) {
-  cli_abort("Not implemented for {.cls {class(x)}} objects.")
+  cli::cli_abort("Not implemented for {.cls {class(x)}} objects.")
 }
 
 #' @rdname add_parent_interval
 #' @export
-add_parent_interval.data.table <- function(x, id = "id", start = "start", end = "end", ...) {
-  .add_parent_interval(x, id = id, start = start, end = end)
+add_parent_interval.data.table <- function(x, id = "id",
+                                           start = "start",
+                                           end = "end", ...) {
+  .add_parent_interval(x,
+    id = id,
+    start = start,
+    end = end
+  )
 }
 
 #' @rdname add_parent_interval
 #' @export
-add_parent_interval.tbl_df <- function(x, id = "id", start = "start", end = "end", ...) {
+add_parent_interval.tbl_df <- function(x, id = "id",
+                                       start = "start",
+                                       end = "end", ...) {
   if (!requireNamespace("tibble")) {
-    cli_abort("{.pkg tibble} is required to use this function. Please install to continue.")
+    cli::cli_abort("{.pkg tibble} is required to use this function.
+              Please install to continue.")
   }
-  out <- .add_parent_interval(x, id = id, start = start, end = end)
-  tibble::as_tibble(setDF(out))
+  out <- .add_parent_interval(x,
+    id = id,
+    start = start,
+    end = end
+  )
+  tibble::as_tibble(data.table::setDF(out))
 }
 
 #' @rdname add_parent_interval
 #' @export
-add_parent_interval.data.frame <- function(x, id = "id", start = "start", end = "end", ...) {
-  out <- .add_parent_interval(x, id = id, start = start, end = end)
+add_parent_interval.data.frame <- function(x, id = "id",
+                                           start = "start",
+                                           end = "end", ...) {
+  out <- .add_parent_interval(x,
+    id = id,
+    start = start,
+    end = end
+  )
   as.data.frame(out)
 }
 
@@ -80,14 +101,18 @@ add_parent_interval.data.frame <- function(x, id = "id", start = "start", end = 
 # -------------------------------------------------------------------------
 # internals ---------------------------------------------------------------
 # -------------------------------------------------------------------------
-.add_parent_interval <- function(x, id, start, end, call = caller_env()) {
+.add_parent_interval <- function(x,
+                                 id,
+                                 start,
+                                 end,
+                                 call = caller_env()) {
   # check specified columns are present
   nms <- names(x)
   vars <- c(id, start, end)
   present <- vars %in% nms
   if (any(!present)) {
     v <- vars[!present][1]
-    cli_abort(
+    cli::cli_abort(
       "{.val {v}} is not a column in {.arg x}",
       call = call
     )
@@ -101,17 +126,23 @@ add_parent_interval.data.frame <- function(x, id = "id", start = "start", end = 
   end_cond <- !inherits(vec_end, "Date") && !inherits(vec_end, "POSIXct")
   i_cond <- !identical(class(vec_start), class(vec_end))
   if (start_cond || end_cond || i_cond) {
-    cli_abort(
-      "{.arg start} and {.arg end} columns must both be either {.cls Date} or {.cls POSIXct}.",
+    cli::cli_abort(
+      "{.arg start} and {.arg end} columns must both be
+      either {.cls Date} or {.cls POSIXct}.",
       call = call
     )
   }
 
   vec_id <- .subset2(x, id)
-  DT <- as.data.table(list(id = vec_id, start = vec_start, end = vec_end))
-  setorder(DT, id, start)
-  DT <- DT[, c(".parent_start", ".parent_end", ".interval_number") := .calculate_parent(start, end), keyby = id]
-  setnames(DT, old = "id", new = id)
+  DT <- data.table::as.data.table(list(
+    id = vec_id,
+    start = vec_start,
+    end = vec_end
+  ))
+  data.table::setorder(DT, id, start)
+  DT <- DT[, c(".parent_start", ".parent_end", ".interval_number") :=
+    .calculate_parent(start, end), keyby = id]
+  data.table::setnames(DT, old = "id", new = id)
 }
 
 .calculate_parent <- function(start, end) {
