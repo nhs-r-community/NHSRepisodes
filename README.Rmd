@@ -6,20 +6,20 @@ output: github_document
 
 ```{r, include = FALSE}
 if (!requireNamespace("dplyr", quietly = TRUE)) {
-  warning(call. = FALSE, "This vignette requires dplyr >= v1.1.0.")
-  knitr::knit_exit()
+    warning(call. = FALSE, "This README requires dplyr >= v1.1.0.")
+    knitr::knit_exit()
 }
 
 if (!requireNamespace("ivs", quietly = TRUE)) {
-  warning(call. = FALSE, "This vignette requires dplyr >= v1.1.0.")
-  knitr::knit_exit()
+    warning(call. = FALSE, "This README requires ivs.")
+    knitr::knit_exit()
 }
 
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.path = "man/figures/README-",
-  out.width = "100%"
+    collapse = TRUE,
+    comment = "#>",
+    fig.path = "man/figures/README-",
+    out.width = "100%"
 )
 ```
 
@@ -28,6 +28,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![R-CMD-check](https://github.com/nhs-r-community/NHSRepisodes/workflows/R-CMD-check/badge.svg)](https://github.com/nhs-r-community/NHSRepisodes/actions)
+[![R-CMD-check](https://github.com/nhs-r-community/NHSRepisodes/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/nhs-r-community/NHSRepisodes/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 ***NHSRepisodes*** is a (hopefully) temporary solution to a small inconvenience
@@ -47,12 +48,13 @@ library(ivs)
 library(data.table)
 
 # note - we need functionality introduced in dplyr 1.1.0.
-
-if (getNamespaceVersion("dplyr") < "1.1.0")
-    stop("Please update dplyr to version 1.1.0 or higher to run these examples.")
+if (getNamespaceVersion("dplyr") < "1.1.0") {
+    warning("Please update dplyr to version 1.1.0 or higher to run these examples.")
+    knitr::knit_exit()
+}
     
-# Create a dummy data set
 
+# Create a dummy data set give the first and last dates of an episode
 dat <- tribble(
     ~id, ~start, ~end,
     1L, "2020-01-01", "2020-01-10",
@@ -66,7 +68,6 @@ dat <- tribble(
 )
 
 # This will create an object called dat and also open in the console
-
 (dat <- mutate(dat, across(start:end, as.Date)))
 ```
 
@@ -75,47 +76,42 @@ across these episodes:
 
 ```{r}
 dat |>
-  mutate(interval = iv(start, end + 1)) |>
-  reframe(interval = iv_groups(interval), .by = id)
+    mutate(interval = iv(start = start, end = end + 1)) |>
+    reframe(interval = iv_groups(interval, abutting = FALSE), .by = id)
 ```
 
-The intervals have an opening square bracket `[` as the start is inclusive whilst
-the end date has a rounded bracket `)` as it is exclusive. Consequently, the 
-first row where the dates are `2020-01-01` to `2020-01-10` would only count from
-`2020-01-01` to `2020-01-09` normally but as we want to count the full day (the
-10th) the column `interval` has an additional day added.
+Note that {ivs} creates intervals that are *right-open* meaning they are
+inclusive on the left (have an opening square bracket `[`) and exclusive on the
+right (with a closing a rounded bracket `)`). Consequently, in our first call to
+`mutate()` we added 1 to the `end` value. This ensures that the full range of
+dates are considered (e.g. for the first row we want to consider all days from
+`2020-01-01` to `2020-01-10` not only up until `2020-01-09`).
 
-The second change uses `reframe()` from {dplyr}, replacing the `summarise()` 
-function as the data frame returns more than one row which was deprecated in
-{dplyr} version 1.1.0.
-
-This is great when we only have a small number of ids to group by but is
-noticeably slow for a larger number:
+This works great when we only have a small number of ids to group by. However,
+it becomes noticeably slow for a larger number:
 
 ```{r}
 # Creating a larger data set
-
 n <- 125000
 id2 <- sample(seq_len(n), size = n * 5, replace = TRUE)
 start2 <- as.Date("2020-01-01") + sample.int(365, size = n * 5, replace = TRUE)
 end2 <- start2 + sample(1:100, size = n * 5, replace = TRUE)
 
 # creates the object big_dat and shows the first 10 rows as a tibble in the console
-
 (big_dat <- tibble(id = id2, start = start2, end = end2))
 
 # checking the time to run
-
 system.time(
-  out <- big_dat |>
-    mutate(interval = iv(start, end + 1)) |>
-    reframe(interval = iv_groups(interval), .by = id)
+    out <- big_dat |>
+        mutate(interval = iv(start, end + 1)) |>
+        reframe(interval = iv_groups(interval, abutting = FALSE), .by = id)
 )
 ```
 
 If you were not already using it, this is likely the time you would reach for
 the {data.table} package. Unfortunately the interval class created by {ivs} is 
-built upon on the [record type from vctrs](https://vctrs.r-lib.org/reference/new_rcrd.html),
+built upon on the
+[record type from vctrs](https://vctrs.r-lib.org/reference/new_rcrd.html),
 and this class is not supported in {data.table}:
 
 ```{r, error=TRUE}
@@ -130,9 +126,9 @@ merge_episodes(big_dat)
 
 # And for comparison with earlier timings
 system.time(
-  out2 <- big_dat |>
-    merge_episodes() |>
-    mutate(interval = iv(start = .episode_start, end = .episode_end + 1))
+    out2 <- big_dat |>
+        merge_episodes() |>
+        mutate(interval = iv(start = .episode_start, end = .episode_end + 1))
 )
 
 # equal output (subject to ordering)

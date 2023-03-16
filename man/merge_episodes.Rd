@@ -19,24 +19,30 @@ merge_episodes(x, ...)
 \method{merge_episodes}{data.frame}(x, id = "id", start = "start", end = "end", ...)
 }
 \arguments{
-\item{x}{An \R object.}
+\item{x}{\R object.}
 
 \item{...}{Not currently used.}
 
 \item{id}{\verb{[character]}
+
 Variable in \code{x} representing the id associated with the episode.}
 
 \item{start}{\verb{[character]}
-Variable in \code{x} representing the start of the episode. Must refer to a
-variable that is either class \verb{<Date>} or \verb{<POSIXct>}.}
+
+Variable in \code{x} representing the start of the episode.
+
+Must refer to a variable that is either class \verb{<Date>} or \verb{<POSIXct>}.}
 
 \item{end}{\verb{[character]}
-Variable in \code{x} representing the start of the episode. Must refer to a
-variable that is the same class as \code{start}.}
+
+Variable in \code{x} representing the start of the episode.
+
+Must refer to a variable that is the same class as \code{start}.}
 }
 \value{
-The resulting combined episode intervals split by id and interval number. The
-returned object will be of the same class as the input \code{x} (i.e. a
+The resulting combined episode intervals split by id and interval number.
+
+The returned object will be of the same class as the input \code{x} (i.e. a
 data.frame, data.table or tibble).
 }
 \description{
@@ -46,15 +52,15 @@ data.frame like objects.
 }
 \examples{
 dat <- data.frame(
-  id = c(1, 1, 2, 2, 2, 1),
-  start = as.Date(c(
-    "2020-01-01", "2020-01-03", "2020-04-01",
-    "2020-04-15", "2020-04-17", "2020-05-01"
-  )),
-  end = as.Date(c(
-    "2020-01-10", "2020-01-10", "2020-04-30",
-    "2020-04-16", "2020-04-19", "2020-10-01"
-  ))
+    id = c(1, 1, 2, 2, 2, 1),
+    start = as.Date(c(
+        "2020-01-01", "2020-01-03", "2020-04-01",
+        "2020-04-15", "2020-04-17", "2020-05-01"
+    )),
+    end = as.Date(c(
+        "2020-01-10", "2020-01-10", "2020-04-30",
+        "2020-04-16", "2020-04-19", "2020-10-01"
+    ))
 )
 
 merge_episodes(dat)
