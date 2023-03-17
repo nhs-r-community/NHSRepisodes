@@ -1,6 +1,11 @@
 ^NHSRepisodes\.Rproj$
+^LICENSE\.md$
+^.*\.Rproj$
 ^\.Rproj\.user$
 ^README\.Rmd$
-^LICENSE\.md$
-^episodes\.Rproj$
 ^\.github$
+^cran-comments\.md$
+^CRAN-SUBMISSION$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
