@@ -30,6 +30,16 @@ knitr::opts_chunk$set(
 [![R-CMD-check](https://github.com/nhs-r-community/NHSRepisodes/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/nhs-r-community/NHSRepisodes/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
+## Installation instructions
+
+You can install the development version of this package from GitHub with:
+
+``` r
+# install.packages("remotes")
+remotes::install_github("https://github.com/nhs-r-community/NHSRepisodes")
+```
+
+
 ***NHSRepisodes*** is a (hopefully) temporary solution to a small inconvenience
 that relates to [data.table](https://cran.r-project.org/package=data.table),
 [dplyr](https://cran.r-project.org/package=dplyr) and

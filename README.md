@@ -10,6 +10,16 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 [![R-CMD-check](https://github.com/nhs-r-community/NHSRepisodes/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/nhs-r-community/NHSRepisodes/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
+## Installation instructions
+
+You can install the development version of this package from GitHub
+with:
+
+``` r
+# install.packages("remotes")
+remotes::install_github("https://github.com/nhs-r-community/NHSRepisodes")
+```
+
 ***NHSRepisodes*** is a (hopefully) temporary solution to a small
 inconvenience that relates to
 [data.table](https://cran.r-project.org/package=data.table),
@@ -103,16 +113,16 @@ end2 <- start2 + sample(1:100, size = n * 5, replace = TRUE)
 #> # A tibble: 625,000 × 3
 #>        id start      end       
 #>     <int> <date>     <date>    
-#>  1  64728 2020-08-09 2020-11-16
-#>  2 123866 2020-02-06 2020-03-18
-#>  3 120056 2020-05-22 2020-07-21
-#>  4 113558 2020-10-30 2020-12-26
-#>  5  15707 2020-06-29 2020-08-04
-#>  6  64747 2020-12-20 2021-03-24
-#>  7 117112 2020-04-28 2020-05-02
-#>  8  48401 2020-12-06 2021-01-07
-#>  9  24905 2020-03-20 2020-03-22
-#> 10 106783 2020-07-20 2020-09-30
+#>  1  64133 2020-10-04 2020-10-10
+#>  2  95674 2020-10-23 2021-01-21
+#>  3   7573 2020-08-09 2020-08-22
+#>  4  33466 2020-08-15 2020-10-07
+#>  5  88115 2020-09-03 2020-11-06
+#>  6  97118 2020-02-18 2020-05-13
+#>  7 115223 2020-06-13 2020-08-09
+#>  8  11407 2020-07-24 2020-08-13
+#>  9  34386 2020-07-13 2020-09-26
+#> 10  51602 2020-01-04 2020-03-21
 #> # … with 624,990 more rows
 
 # checking the time to run
@@ -122,7 +132,7 @@ system.time(
         reframe(interval = iv_groups(interval, abutting = FALSE), .by = id)
 )
 #>    user  system elapsed 
-#>  21.762   0.077  21.900
+#>   40.47    0.37   41.07
 ```
 
 If you were not already using it, this is likely the time you would
@@ -141,20 +151,20 @@ DT[, interval := iv(start, end + 1)]
 
 ``` r
 merge_episodes(big_dat)
-#> # A tibble: 336,081 × 4
+#> # A tibble: 334,877 × 4
 #>       id .interval_number .episode_start .episode_end
 #>    <int>            <int> <date>         <date>      
-#>  1     1                1 2020-04-01     2020-06-23  
-#>  2     1                2 2020-10-06     2021-03-12  
-#>  3     2                1 2020-01-12     2020-02-01  
-#>  4     2                2 2020-02-03     2020-02-24  
-#>  5     2                3 2020-03-25     2020-04-08  
-#>  6     2                4 2020-05-16     2020-08-13  
-#>  7     2                5 2020-12-01     2021-02-18  
-#>  8     3                1 2020-01-02     2020-04-04  
-#>  9     3                2 2020-08-11     2020-11-05  
-#> 10     3                3 2020-11-26     2021-03-08  
-#> # … with 336,071 more rows
+#>  1     1                1 2020-01-12     2020-04-30  
+#>  2     1                2 2020-06-29     2020-08-23  
+#>  3     1                3 2020-10-08     2021-01-10  
+#>  4     2                1 2020-01-22     2020-01-25  
+#>  5     2                2 2020-03-28     2020-08-20  
+#>  6     2                3 2020-09-20     2020-10-03  
+#>  7     2                4 2020-12-09     2021-01-30  
+#>  8     3                1 2020-04-26     2020-09-17  
+#>  9     3                2 2020-10-16     2020-12-30  
+#> 10     4                1 2020-02-02     2020-09-17  
+#> # … with 334,867 more rows
 
 # And for comparison with earlier timings
 system.time(
@@ -163,7 +173,7 @@ system.time(
         mutate(interval = iv(start = .episode_start, end = .episode_end + 1))
 )
 #>    user  system elapsed 
-#>   0.731   0.000   0.585
+#>    1.06    0.00    0.92
 
 # equal output (subject to ordering)
 all.equal(arrange(out, id, interval), select(out2, id, interval))
