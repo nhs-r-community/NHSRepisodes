@@ -63,7 +63,7 @@ add_parent_interval <- function(x, ...) {
 #' @rdname add_parent_interval
 #' @export
 add_parent_interval.default <- function(x, ...) {
-    cli::cli_abort("Not implemented for {.cls {class(x)}} objects.")
+    stopf("Not implemented for <%s> objects.", toString(class(x)))
 }
 
 # -------------------------------------------------------------------------
@@ -78,10 +78,7 @@ add_parent_interval.data.table <- function(x, id = "id", start = "start", end = 
 #' @export
 add_parent_interval.tbl_df <- function(x, id = "id", start = "start", end = "end", ...) {
     if (!requireNamespace("tibble")) {
-        cli::cli_abort(
-            "{.pkg tibble} is required to use this function.
-            Please install to continue."
-        )
+        stop("{tibble} is required to use this function. Please install to continue.")
     }
     out <- .add_parent_interval(x, id = id, start = start, end = end)
     tibble::as_tibble(data.table::setDF(out))
@@ -101,14 +98,14 @@ add_parent_interval.data.frame <- function(x, id = "id", start = "start", end = 
 # -------------------------------- INTERNALS ------------------------------ #
 # ------------------------------------------------------------------------- #
 # ------------------------------------------------------------------------- #
-.add_parent_interval <- function(x, id, start, end, call = caller_env()) {
+.add_parent_interval <- function(x, id, start, end, call = sys.call(-1L)) {
     # check specified columns are present
     nms <- names(x)
     vars <- c(id, start, end)
     present <- vars %in% nms
     if (any(!present)) {
         v <- vars[!present][1]
-        cli::cli_abort("{.val {v}} is not a column in {.arg x}", call = call)
+        stopf("%s is not a column in `x`", sQuote(v), .call = call)
     }
 
     # check start and end are of a valid and identical class
@@ -119,11 +116,7 @@ add_parent_interval.data.frame <- function(x, id = "id", start = "start", end = 
     end_cond <- !inherits(vec_end, "Date") && !inherits(vec_end, "POSIXct")
     i_cond <- !identical(class(vec_start), class(vec_end))
     if (start_cond || end_cond || i_cond) {
-        cli::cli_abort(
-            "{.arg start} and {.arg end} columns must both be
-            either {.cls Date} or {.cls POSIXct}.",
-            call = call
-        )
+        stopf("`start` and `end` columns must both be either <Date> or <POSIXct>.")
     }
 
     vec_id <- .subset2(x, id)
