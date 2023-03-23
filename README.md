@@ -20,6 +20,8 @@ with:
 remotes::install_github("https://github.com/nhs-r-community/NHSRepisodes")
 ```
 
+## Motivation
+
 ***NHSRepisodes*** is a (hopefully) temporary solution to a small
 inconvenience that relates to
 [data.table](https://cran.r-project.org/package=data.table),
@@ -113,16 +115,16 @@ end2 <- start2 + sample(1:100, size = n * 5, replace = TRUE)
 #> # A tibble: 625,000 × 3
 #>        id start      end       
 #>     <int> <date>     <date>    
-#>  1  39745 2020-10-28 2021-02-02
-#>  2  53239 2020-12-13 2021-02-24
-#>  3  72799 2020-05-20 2020-06-27
-#>  4 112574 2020-05-02 2020-07-10
-#>  5 116233 2020-05-16 2020-07-02
-#>  6  19163 2020-12-15 2021-03-24
-#>  7  33389 2020-04-12 2020-06-23
-#>  8  95680 2020-02-16 2020-03-10
-#>  9  29415 2020-03-05 2020-05-18
-#> 10   5750 2020-09-05 2020-09-13
+#>  1  73580 2020-08-13 2020-10-16
+#>  2 112792 2020-03-05 2020-04-24
+#>  3  15347 2020-09-02 2020-10-26
+#>  4  60433 2020-05-30 2020-08-12
+#>  5  89037 2020-08-02 2020-08-10
+#>  6  40335 2020-07-29 2020-08-24
+#>  7  34577 2020-08-10 2020-11-02
+#>  8  55091 2020-08-28 2020-10-29
+#>  9 123510 2020-06-29 2020-08-26
+#> 10  25508 2020-01-30 2020-04-28
 #> # ℹ 624,990 more rows
 
 # checking the time to run
@@ -132,7 +134,7 @@ system.time(
         reframe(interval = iv_groups(interval, abutting = FALSE), .by = id)
 )
 #>    user  system elapsed 
-#>  22.756   0.086  22.914
+#>  22.912   0.103  23.125
 ```
 
 If you were not already using it, this is likely the time you would
@@ -151,20 +153,20 @@ DT[, interval := iv(start, end + 1)]
 
 ``` r
 merge_episodes(big_dat)
-#> # A tibble: 335,618 × 4
+#> # A tibble: 336,132 × 4
 #>       id .interval_number .episode_start .episode_end
 #>    <int>            <int> <date>         <date>      
-#>  1     1                1 2020-03-03     2020-04-04  
-#>  2     1                2 2020-05-18     2020-06-17  
-#>  3     1                3 2020-08-07     2020-10-05  
-#>  4     1                4 2020-10-17     2021-01-29  
-#>  5     2                1 2020-06-04     2020-11-16  
-#>  6     2                2 2020-12-20     2021-03-28  
-#>  7     3                1 2020-06-08     2020-09-13  
-#>  8     3                2 2020-10-02     2020-12-29  
-#>  9     4                1 2020-01-24     2020-02-01  
-#> 10     4                2 2020-02-06     2020-03-28  
-#> # ℹ 335,608 more rows
+#>  1     1                1 2020-03-18     2020-07-17  
+#>  2     1                2 2020-12-16     2021-01-13  
+#>  3     2                1 2020-07-04     2020-09-14  
+#>  4     2                2 2020-11-07     2020-11-28  
+#>  5     3                1 2020-01-06     2020-02-07  
+#>  6     3                2 2020-04-23     2020-09-12  
+#>  7     4                1 2020-03-21     2020-03-27  
+#>  8     4                2 2020-09-07     2020-11-27  
+#>  9     5                1 2020-03-30     2020-04-22  
+#> 10     5                2 2020-04-29     2020-07-22  
+#> # ℹ 336,122 more rows
 
 # And for comparison with earlier timings
 system.time(
@@ -173,7 +175,7 @@ system.time(
         mutate(interval = iv(start = .episode_start, end = .episode_end + 1))
 )
 #>    user  system elapsed 
-#>   0.735   0.000   0.601
+#>   0.750   0.000   0.611
 
 # equal output (subject to ordering)
 all.equal(arrange(out, id, interval), select(out2, id, interval))

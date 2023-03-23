@@ -39,6 +39,7 @@ You can install the development version of this package from GitHub with:
 remotes::install_github("https://github.com/nhs-r-community/NHSRepisodes")
 ```
 
+## Motivation
 
 ***NHSRepisodes*** is a (hopefully) temporary solution to a small inconvenience
 that relates to [data.table](https://cran.r-project.org/package=data.table),
