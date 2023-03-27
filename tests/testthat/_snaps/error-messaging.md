@@ -8,7 +8,7 @@
 
 ---
 
-    "end" is not a column in `x`
+    'end' is not a column in `x`
 
 ---
 

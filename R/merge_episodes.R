@@ -65,7 +65,7 @@ merge_episodes <- function(x, ...) {
 #' @rdname merge_episodes
 #' @export
 merge_episodes.default <- function(x, ...) {
-    cli::cli_abort("Not implemented for {.cls {class(x)}} objects.")
+    stopf("Not implemented for <%s> objects.", toString(class(x)))
 }
 
 # -------------------------------------------------------------------------
@@ -80,10 +80,7 @@ merge_episodes.data.table <- function(x, id = "id", start = "start", end = "end"
 #' @export
 merge_episodes.tbl_df <- function(x, id = "id", start = "start", end = "end", ...) {
     if (!requireNamespace("tibble")) {
-        cli::cli_abort(
-            "{.pkg tibble} is required to use this function.
-            Please install to continue."
-        )
+        stop("{tibble} is required to use this function. Please install to continue.")
     }
     DT <- .merge_episodes(x, id = id, start = start, end = end)
     tibble::as_tibble(data.table::setDF(DT))
@@ -109,7 +106,7 @@ merge_episodes.data.frame <- function(x, id = "id", start = "start", end = "end"
         id = id,
         start = start,
         end = end,
-        call = rlang::caller_env()
+        call = sys.call(-1L)
     )
     DT[,
        .(.episode_start = min(.parent_start), .episode_end = max(.parent_end)),
