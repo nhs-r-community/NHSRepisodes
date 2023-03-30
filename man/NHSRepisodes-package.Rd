@@ -4,7 +4,7 @@
 \name{NHSRepisodes-package}
 \alias{NHSRepisodes}
 \alias{NHSRepisodes-package}
-\title{NHSRepisodes: Package relating to Hospital Episode Intervals}
+\title{NHSRepisodes: Package Relating to Hospital Episode Intervals}
 \description{
 Hospital episodes can overlap or have gaps which can result in under or over counting. This package contains functions which can be used to rectify this common analytical issue in NHS data.
 }
