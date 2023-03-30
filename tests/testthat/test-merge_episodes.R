@@ -23,7 +23,7 @@ test_that("merge_episodes works on a small set of values", {
     out1a <- dat1 |>
         dplyr::mutate(interval = ivs::iv(start, end + 1)) |>
         dplyr::reframe(interval = ivs::iv_groups(interval, abutting = FALSE), .by = id) |>
-        dplyr::arrange(id)
+        dplyr::arrange(id, interval)
 
     out1b <- dat1 |>
         merge_episodes() |>
@@ -38,7 +38,7 @@ test_that("merge_episodes works on a small set of values", {
     out2a <- dat2 |>
         dplyr::mutate(interval = ivs::iv(start, end + 1)) |>
         dplyr::reframe(interval = ivs::iv_groups(interval, abutting = FALSE), .by = id)|>
-        dplyr::arrange(id)
+        dplyr::arrange(id, interval)
 
     out2b <- dat2 |>
         merge_episodes() |>
@@ -65,7 +65,7 @@ test_that("merge_episodes works on a large set of values", {
     out1a <- dat1 |>
         dplyr::mutate(interval = ivs::iv(start, end + 1)) |>
         dplyr::reframe(interval = ivs::iv_groups(interval, abutting = FALSE), .by = id) |>
-        dplyr::arrange(id)
+        dplyr::arrange(id, interval)
 
     out1b <- dat1 |>
         merge_episodes() |>
@@ -80,7 +80,7 @@ test_that("merge_episodes works on a large set of values", {
     out2a <- dat2 |>
         dplyr::mutate(interval = ivs::iv(start, end + 1)) |>
         dplyr::reframe(interval = ivs::iv_groups(interval, abutting = FALSE), .by = id) |>
-        dplyr::arrange(id)
+        dplyr::arrange(id, interval)
 
     out2b <- dat2 |>
         merge_episodes() |>

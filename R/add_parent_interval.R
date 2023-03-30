@@ -33,7 +33,13 @@
 #'
 # -------------------------------------------------------------------------
 #' @return
-#' The input data with additional columns for the corresponding parent interval.
+#' The input data with additional columns for the corresponding parent interval
+#' (split across `id` values).
+#'
+#' Additional columns will be labelled '.parent_start', '.parent_end' and
+#' '.interval_number' where the interval number is in order of occurrence of
+#' the corresponding parent interval.
+#'
 #' The returned object will be of the same class as the input `x` (i.e. a
 #' data.frame, data.table or tibble).
 #'
@@ -99,8 +105,22 @@ add_parent_interval.data.frame <- function(x, id = "id", start = "start", end = 
 # ------------------------------------------------------------------------- #
 # ------------------------------------------------------------------------- #
 .add_parent_interval <- function(x, id, start, end, call = sys.call(-1L)) {
-    # check specified columns are present
+
+    .position <- NULL # for CRAN package checks
+
+    # check input data.frame does not used reserved names
+    # TODO - this could be better but will suffice for time being
+    reserved <- c(".position", ".parent_start", ".parent_end", ".interval_number")
     nms <- names(x)
+    matches <- nms[nms %in% reserved]
+    if (length(matches)) {
+        stopf(
+            "`x` cannot have a column named %s for this function to work",
+            sQuote(matches[1L])
+        )
+    }
+
+    # check specified columns are present
     vars <- c(id, start, end)
     present <- vars %in% nms
     if (any(!present)) {
@@ -111,7 +131,6 @@ add_parent_interval.data.frame <- function(x, id = "id", start = "start", end = 
     # check start and end are of a valid and identical class
     vec_start <- .subset2(x, start)
     vec_end <- .subset2(x, end)
-
     start_cond <- !inherits(vec_start, "Date") && !inherits(vec_start, "POSIXct")
     end_cond <- !inherits(vec_end, "Date") && !inherits(vec_end, "POSIXct")
     i_cond <- !identical(class(vec_start), class(vec_end))
@@ -119,12 +138,20 @@ add_parent_interval.data.frame <- function(x, id = "id", start = "start", end = 
         stopf("`start` and `end` columns must both be either <Date> or <POSIXct>.")
     }
 
-    vec_id <- .subset2(x, id)
-    DT <- as.data.table(list(id = vec_id, start = vec_start, end = vec_end))
-    setorder(DT, id, start)
-    DT <- DT[, c(".parent_start", ".parent_end", ".interval_number") :=
-                 .calculate_parent(start, end), keyby = id]
-    setnames(DT, old = "id", new = id)
+    # Ensure input is data.table
+    DT <- as.data.table(x)
+
+    # add position column so we can return original ordering
+    DT[, .position := .I]
+
+    # .calculate_parent requires us to be ordered by start date to work
+    setorderv(DT, cols = c(id, start))
+    DT[,c(".parent_start", ".parent_end", ".interval_number") :=
+           .calculate_parent(start, end), keyby = c(id)]
+
+    # return original ordering
+    setorder(DT, .position)
+    DT[,.position :=NULL]
 }
 
 .calculate_parent <- function(start, end) {

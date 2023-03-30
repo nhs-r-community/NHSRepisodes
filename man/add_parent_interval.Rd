@@ -40,7 +40,13 @@ Variable in \code{x} representing the start of the episode.
 Must refer to a variable that is the same class as \code{start}.}
 }
 \value{
-The input data with additional columns for the corresponding parent interval.
+The input data with additional columns for the corresponding parent interval
+(split across \code{id} values).
+
+Additional columns will be labelled '.parent_start', '.parent_end' and
+'.interval_number' where the interval number is in order of occurrence of
+the corresponding parent interval.
+
 The returned object will be of the same class as the input \code{x} (i.e. a
 data.frame, data.table or tibble).
 }
