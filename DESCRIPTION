@@ -1,6 +1,6 @@
 Package: NHSRepisodes
-Title: Package relating to Hospital Episode Intervals
-Version: 0.0.0.9000
+Title: Package Relating to Hospital Episode Intervals
+Version: 0.1.0
 Authors@R: 
     c(person(given = "Zoë",
              family = "Turner",

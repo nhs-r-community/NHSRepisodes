@@ -40,7 +40,8 @@ Variable in \code{x} representing the start of the episode.
 Must refer to a variable that is the same class as \code{start}.}
 }
 \value{
-The resulting combined episode intervals split by id and interval number.
+The resulting combined episode intervals split by id and ordered by interval
+number.
 
 The returned object will be of the same class as the input \code{x} (i.e. a
 data.frame, data.table or tibble).

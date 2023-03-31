@@ -34,7 +34,8 @@
 # -------------------------------------------------------------------------
 #' @return
 #'
-#' The resulting combined episode intervals split by id and interval number.
+#' The resulting combined episode intervals split by id and ordered by interval
+#' number.
 #'
 #' The returned object will be of the same class as the input `x` (i.e. a
 #' data.frame, data.table or tibble).
@@ -108,7 +109,8 @@ merge_episodes.data.frame <- function(x, id = "id", start = "start", end = "end"
         end = end,
         call = sys.call(-1L)
     )
-    DT[,
+    DT <- DT[,
        .(.episode_start = min(.parent_start), .episode_end = max(.parent_end)),
        by = c(id, ".interval_number")]
+    setorderv(DT, c(id, ".episode_start"))
 }
