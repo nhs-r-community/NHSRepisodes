@@ -46,7 +46,7 @@ that relates to [data.table](https://cran.r-project.org/package=data.table),
 [dplyr](https://cran.r-project.org/package=dplyr) and
 [ivs](https://cran.r-project.org/package=ivs); namely that dplyr is currently
 [slow when working with a large number of groupings](https://github.com/tidyverse/dplyr/issues/5017)
-and data.table [does not support the record class](https://github.com/Rdatatable/data.table/issues/4910)
+and data.table [does not easily support the record class](https://github.com/Rdatatable/data.table/issues/4910)
 on which ivs intervals are based.
 
 To expand on issues consider the following small set of episode data:
@@ -62,7 +62,10 @@ if (getNamespaceVersion("dplyr") < "1.1.0") {
     warning("Please update dplyr to version 1.1.0 or higher to run these examples.")
     knitr::knit_exit()
 }
-    
+
+# Let's note the package versions used in generating this README
+packages <- c("NHSRepisodes", "dplyr", "data.table", "ivs")
+mutate(tibble(packages), version = sapply(packages, getNamespaceVersion))
 
 # Create a dummy data set give the first and last dates of an episode
 dat <- tribble(
@@ -112,7 +115,8 @@ end2 <- start2 + sample(1:100, size = n * 5, replace = TRUE)
 
 # checking the time to run
 system.time(
-    out <- big_dat |>
+    out_dplyr <- 
+        big_dat |>
         mutate(interval = iv(start, end + 1)) |>
         reframe(interval = iv_groups(interval, abutting = FALSE), .by = id)
 )
@@ -129,20 +133,43 @@ DT <- as.data.table(big_dat)
 DT[, interval := iv(start, end + 1)]
 ```
 
+We can go through a few more steps to get a comparable answer but still find
+slightly slower performance:
+
+```{r}
+fun <- function(s, e) {
+    interval <- iv(s, e)
+    groups <- iv_groups(interval, abutting = FALSE)
+    list(start = iv_start(groups), end = iv_end(groups))
+}
+
+system.time(out_dt <- DT[, fun(start, end + 1), by = id])
+```
+
 ***NHSRepisodes*** solves this with the `merge_episodes()` function:
 
 ```{r}
 merge_episodes(big_dat)
 
 # And for comparison with earlier timings
-system.time(
-    out2 <- big_dat |>
-        merge_episodes() |>
-        mutate(interval = iv(start = .episode_start, end = .episode_end + 1))
-)
+system.time(out <- merge_episodes(big_dat))
 
 # equal output (subject to ordering)
-all.equal(arrange(out, id, interval), select(out2, id, interval))
+out <- out |> 
+    mutate(interval = iv(start = .episode_start, end = .episode_end + 1)) |> 
+    select(id, interval)
+
+out_dplyr <- arrange(out_dplyr, id, interval)
+
+out_dt <- out_dt |> 
+    as.data.frame() |> 
+    as_tibble() |> 
+    mutate(interval = iv(start = start, end = end)) |> 
+    select(id, interval) |> 
+    arrange(id, interval)
+
+all.equal(out, out_dplyr)
+all.equal(out, out_dt)
 ```
 
 We also provide another function `add_parent_interval()` that associates the

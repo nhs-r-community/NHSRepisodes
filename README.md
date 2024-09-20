@@ -29,7 +29,7 @@ inconvenience that relates to
 [ivs](https://cran.r-project.org/package=ivs); namely that dplyr is
 currently [slow when working with a large number of
 groupings](https://github.com/tidyverse/dplyr/issues/5017) and
-data.table [does not support the record
+data.table [does not easily support the record
 class](https://github.com/Rdatatable/data.table/issues/4910) on which
 ivs intervals are based.
 
@@ -46,7 +46,17 @@ if (getNamespaceVersion("dplyr") < "1.1.0") {
     warning("Please update dplyr to version 1.1.0 or higher to run these examples.")
     knitr::knit_exit()
 }
-    
+
+# Let's note the package versions used in generating this README
+packages <- c("NHSRepisodes", "dplyr", "data.table", "ivs")
+mutate(tibble(packages), version = sapply(packages, getNamespaceVersion))
+#> # A tibble: 4 × 2
+#>   packages     version   
+#>   <chr>        <chr>     
+#> 1 NHSRepisodes 0.1.0.9000
+#> 2 dplyr        1.1.4.9000
+#> 3 data.table   1.16.0    
+#> 4 ivs          0.2.0
 
 # Create a dummy data set give the first and last dates of an episode
 dat <- tribble(
@@ -113,28 +123,29 @@ end2 <- start2 + sample(1:100, size = n * 5, replace = TRUE)
 # creates the object big_dat and shows the first 10 rows as a tibble in the console
 (big_dat <- tibble(id = id2, start = start2, end = end2))
 #> # A tibble: 625,000 × 3
-#>        id start      end       
-#>     <int> <date>     <date>    
-#>  1 114798 2020-03-04 2020-05-03
-#>  2  68797 2020-06-03 2020-07-08
-#>  3 103153 2020-07-19 2020-09-30
-#>  4  74159 2020-07-18 2020-10-03
-#>  5  17465 2020-02-28 2020-04-27
-#>  6   2063 2020-03-19 2020-04-11
-#>  7 109761 2020-04-16 2020-04-23
-#>  8  54742 2020-09-05 2020-09-21
-#>  9 115526 2020-03-31 2020-05-20
-#> 10  73003 2020-01-19 2020-03-06
+#>       id start      end       
+#>    <int> <date>     <date>    
+#>  1 90983 2020-02-07 2020-03-18
+#>  2 59640 2020-07-05 2020-08-13
+#>  3 29543 2020-04-05 2020-05-28
+#>  4 17962 2020-06-07 2020-07-21
+#>  5 13032 2020-08-25 2020-09-08
+#>  6 94348 2020-05-11 2020-06-07
+#>  7  7770 2020-03-18 2020-04-03
+#>  8  9570 2020-09-25 2020-12-04
+#>  9 86687 2020-11-04 2021-01-09
+#> 10 66213 2020-04-09 2020-04-16
 #> # ℹ 624,990 more rows
 
 # checking the time to run
 system.time(
-    out <- big_dat |>
+    out_dplyr <- 
+        big_dat |>
         mutate(interval = iv(start, end + 1)) |>
         reframe(interval = iv_groups(interval, abutting = FALSE), .by = id)
 )
 #>    user  system elapsed 
-#>  23.214   0.208  23.830
+#>  13.870   0.065  13.996
 ```
 
 If you were not already using it, this is likely the time you would
@@ -149,36 +160,62 @@ DT[, interval := iv(start, end + 1)]
 #> Error in `[.data.table`(DT, , `:=`(interval, iv(start, end + 1))): Supplied 2 items to be assigned to 625000 items of column 'interval'. If you wish to 'recycle' the RHS please use rep() to make this intent clear to readers of your code.
 ```
 
+We can go through a few more steps to get a comparable answer but still
+find slightly slower performance:
+
+``` r
+fun <- function(s, e) {
+    interval <- iv(s, e)
+    groups <- iv_groups(interval, abutting = FALSE)
+    list(start = iv_start(groups), end = iv_end(groups))
+}
+
+system.time(out_dt <- DT[, fun(start, end + 1), by = id])
+#>    user  system elapsed 
+#>  14.972   0.022  14.984
+```
+
 ***NHSRepisodes*** solves this with the `merge_episodes()` function:
 
 ``` r
 merge_episodes(big_dat)
-#> # A tibble: 336,093 × 4
+#> # A tibble: 334,767 × 4
 #>       id .interval_number .episode_start .episode_end
 #>    <int>            <int> <date>         <date>      
-#>  1     1                1 2020-02-23     2020-04-02  
-#>  2     1                2 2020-07-05     2020-09-03  
-#>  3     2                1 2020-07-12     2020-09-27  
-#>  4     2                2 2020-11-21     2021-02-13  
-#>  5     3                1 2020-01-08     2020-07-17  
-#>  6     3                2 2020-08-11     2020-11-06  
-#>  7     4                1 2020-03-08     2020-12-22  
-#>  8     5                1 2020-01-09     2020-04-02  
-#>  9     5                2 2020-06-20     2020-09-29  
-#> 10     5                3 2020-10-05     2020-10-17  
-#> # ℹ 336,083 more rows
+#>  1     1                1 2020-04-16     2020-06-23  
+#>  2     2                1 2020-01-12     2020-02-22  
+#>  3     2                2 2020-07-22     2020-08-16  
+#>  4     2                3 2020-09-27     2021-01-11  
+#>  5     3                1 2020-01-06     2020-03-02  
+#>  6     3                2 2020-03-08     2020-03-16  
+#>  7     3                3 2020-06-05     2020-08-26  
+#>  8     4                1 2020-02-05     2020-05-03  
+#>  9     4                2 2020-05-19     2020-09-08  
+#> 10     5                1 2020-01-14     2020-03-13  
+#> # ℹ 334,757 more rows
 
 # And for comparison with earlier timings
-system.time(
-    out2 <- big_dat |>
-        merge_episodes() |>
-        mutate(interval = iv(start = .episode_start, end = .episode_end + 1))
-)
+system.time(out <- merge_episodes(big_dat))
 #>    user  system elapsed 
-#>   0.863   0.001   0.643
+#>   0.917   0.000   0.335
 
 # equal output (subject to ordering)
-all.equal(arrange(out, id, interval), select(out2, id, interval))
+out <- out |> 
+    mutate(interval = iv(start = .episode_start, end = .episode_end + 1)) |> 
+    select(id, interval)
+
+out_dplyr <- arrange(out_dplyr, id, interval)
+
+out_dt <- out_dt |> 
+    as.data.frame() |> 
+    as_tibble() |> 
+    mutate(interval = iv(start = start, end = end)) |> 
+    select(id, interval) |> 
+    arrange(id, interval)
+
+all.equal(out, out_dplyr)
+#> [1] TRUE
+all.equal(out, out_dt)
 #> [1] TRUE
 ```
 
