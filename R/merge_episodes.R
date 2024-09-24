@@ -40,23 +40,20 @@
 #'
 #' @param name_id
 #'
-#' The column name to use for the patient id in the output
-#' [tibble][tibble::tbl_df-class].
+#' The column name to use for the patient id in the output.
 #'
 #' @param name_episode_start
 #'
-#' The column name to use for the start of the episode in the output
-#' [tibble][tibble::tbl_df-class].
+#' The column name to use for the start of the episode in the output.
 #'
 #' @param name_episode_end
 #'
-#' The column name to use for the end of the episode in the output
-#' [tibble][tibble::tbl_df-class].
+#' The column name to use for the end of the episode in the output.
 #'
 #' @param name_episode_number
 #'
 #' The column name to use for the episode number of an individual patient in the
-#' output [tibble][tibble::tbl_df-class].
+#' output.
 #'
 # -------------------------------------------------------------------------
 #' @return

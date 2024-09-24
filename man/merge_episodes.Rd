@@ -68,17 +68,14 @@ Variable must be a \verb{<Date>} or \verb{<POSIXct>} object.
 
 Must refer to a variable that is the same class as \code{start}.}
 
-\item{name_id}{The column name to use for the patient id in the output
-\link[tibble:tbl_df-class]{tibble}.}
+\item{name_id}{The column name to use for the patient id in the output.}
 
-\item{name_episode_start}{The column name to use for the start of the episode in the output
-\link[tibble:tbl_df-class]{tibble}.}
+\item{name_episode_start}{The column name to use for the start of the episode in the output.}
 
-\item{name_episode_end}{The column name to use for the end of the episode in the output
-\link[tibble:tbl_df-class]{tibble}.}
+\item{name_episode_end}{The column name to use for the end of the episode in the output.}
 
 \item{name_episode_number}{The column name to use for the episode number of an individual patient in the
-output \link[tibble:tbl_df-class]{tibble}.}
+output.}
 
 \item{x}{Data frame like object.}
 }

@@ -84,17 +84,14 @@ Variable must be a \verb{<Date>} or \verb{<POSIXct>} object.
 
 Must refer to a variable that is the same class as \code{start}.}
 
-\item{name_id}{The column name to use for the patient id in the output
-\link[tibble:tbl_df-class]{tibble}.}
+\item{name_id}{The column name to use for the patient id in the output.}
 
-\item{name_parent_start}{The column name to use for the start of the parent interval in the output
-\link[tibble:tbl_df-class]{tibble}.}
+\item{name_parent_start}{The column name to use for the start of the parent interval in the output.}
 
-\item{name_parent_end}{The column name to use for the end of the parent interval in the output
-\link[tibble:tbl_df-class]{tibble}.}
+\item{name_parent_end}{The column name to use for the end of the parent interval in the output.}
 
 \item{name_interval_number}{The column name to use for the interval number within the matched parent
-interval in the output \link[tibble:tbl_df-class]{tibble}.}
+interval in the output.}
 
 \item{x}{Data frame like object.}
 }
