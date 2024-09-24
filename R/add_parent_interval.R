@@ -93,6 +93,7 @@ add_parent_interval <- function(...) {
 
 # -------------------------------------------------------------------------
 #' @rdname add_parent_interval
+#' @importFrom cli cli_abort
 #' @importFrom rlang check_dots_empty0
 #' @importFrom ympes assert_scalar_character_not_na
 #' @importFrom data.table data.table setnames setDF
@@ -119,18 +120,16 @@ add_parent_interval.default <- function(
 
     names <- c(name_id, name_parent_start, name_parent_end, name_interval_number)
 
-    if (dups <- anyDuplicated(names)) {
-        stop(sprintf(
-            "Output names must be unique. %s is duplicated.",
-            dQuote(names[dups])
-        ))
+    if (dup <- anyDuplicated(names)) {
+        duplicate <- names[dup]
+        cli_abort("Output names must be unique. {.str {duplicate}} is used multiple times.")
     }
 
     # check start and end are of a valid and identical class
     identical <- identical(class(start), class(end))
     valid <- inherits(start, "Date") || inherits(start, "POSIXct")
     if (!(identical && valid)) {
-        stop("`start` and `end` columns must both be either <Date> or <POSIXct>.")
+        cli_abort("{.arg start} and {.arg end} columns must both be either {.cls Date} or {.cls POSIXct}.")
     }
 
     # C API NOTE: .calculate_parent is expecting start/end to be REAL so we
@@ -140,7 +139,7 @@ add_parent_interval.default <- function(
 
     # check lengths are compatible
     if (length(id) != length(start) || length(id) != length(end)) {
-        stop("`id`, `start` and `end` must be the same length.")
+        cli_abort("{.arg id}, {.arg start} and {.arg end} must be the same length.")
     }
 
     # C API NOTE: .calculate_parent requires us to be ordered by start date
@@ -166,6 +165,7 @@ add_parent_interval.default <- function(
 
 # -------------------------------------------------------------------------
 #' @rdname add_parent_interval
+#' @importFrom cli cli_abort
 #' @importFrom rlang check_dots_empty0
 #' @importFrom vctrs vec_group_id
 #' @importFrom ympes assert_scalar_character_not_na assert_character
@@ -188,7 +188,7 @@ add_parent_interval.data.frame <- function(
     assert_scalar_character_not_na(end)
     assert_character(id)
     if (anyNA(id)) {
-        stop("`id` must be a non-NA character vector.")
+        cli_abort("{.arg id} must be a non-NA character vector.")
     }
 
     # check the output names
@@ -198,20 +198,19 @@ add_parent_interval.data.frame <- function(
 
     output_names <- c(name_parent_start, name_parent_end, name_interval_number)
 
-    if (dups <- anyDuplicated(output_names)) {
-        stop(sprintf(
-            "Output names must be unique. %s is duplicated.",
-            dQuote(output_names[dups])
-        ))
+    if (dup <- anyDuplicated(output_names)) {
+        duplicate <- output_names[dup]
+        cli_abort("Output names must be unique. {.str {duplicate}} is used multiple times.")
     }
 
     # check input data.frame does not use output names
     x_names <- names(x)
     matches <- output_names[output_names %in% x_names]
     if (length(matches)) {
-        stopf(
-            "The output names %s clashes with the column names in `x`. Please choose a different name.",
-            sQuote(matches[1L])
+        match <- matches[1L]
+        cli_abort(
+            "The name {.str {match}} clashes with one of the column names in {.arg x}.
+             Please choose a different name."
         )
     }
 
@@ -219,16 +218,17 @@ add_parent_interval.data.frame <- function(
     input_names <- c(id, start, end)
     matches <- input_names[!input_names %in% x_names]
     if (length(matches)) {
-        stopf(
-            "Not all inputs are present in `x`. No column named %s can be found.",
-            sQuote(matches[1L])
+        match <- matches[1L]
+        cli_abort(
+            "Not all inputs are present in {.arg x}.
+            No column named {.str {match}} can be found."
         )
     }
 
     # id vector
     length_id <- length(id)
     if (!length_id) {
-        stop("`id` must be of length one or more.")
+        cli_abort("{.arg id} must be of length one or more.")
     } else if (length_id != 1L) {
         id <- vec_group_id(x[id])
     } else {

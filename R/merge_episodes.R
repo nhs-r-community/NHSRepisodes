@@ -92,6 +92,7 @@ merge_episodes <- function(...) {
 
 # -------------------------------------------------------------------------
 #' @rdname merge_episodes
+#' @importFrom cli cli_abort
 #' @importFrom rlang check_dots_empty0
 #' @importFrom data.table setDT setnames setorderv setDF
 #' @export
@@ -112,14 +113,19 @@ merge_episodes.default <- function(
     check_dots_empty0(...)
 
     # calculate the parent interval
-    dat <- add_parent_interval(
-        id = id,
-        start = start,
-        end = end,
-        name_id = name_id,
-        name_parent_start = "parent_start",
-        name_parent_end = "parent_end",
-        name_interval_number = name_episode_number
+    dat <- tryCatch(
+        add_parent_interval(
+            id = id,
+            start = start,
+            end = end,
+            name_id = name_id,
+            name_parent_start = "parent_start",
+            name_parent_end = "parent_end",
+            name_interval_number = name_episode_number
+        ),
+        error = function(cnd) {
+            cli_abort("Unable to calculate the parent interval.", parent = cnd)
+        }
     )
 
     # use data.table calculate the start and end by id and episode
@@ -144,6 +150,7 @@ merge_episodes.default <- function(
 
 # -------------------------------------------------------------------------
 #' @rdname merge_episodes
+#' @importFrom cli cli_abort
 #' @importFrom rlang check_dots_empty0
 #' @importFrom data.table setDT setnames setorderv setDF
 #' @export
@@ -161,17 +168,22 @@ merge_episodes.data.frame <- function(
     # for CRAN checks due to NSE
     . <- parent_start <- parent_end <- NULL
 
-    rlang::check_dots_empty0(...)
+    check_dots_empty0(...)
 
     # add the parent interval
-    dat <- add_parent_interval.data.frame(
-        x = x,
-        id = id,
-        start = start,
-        end = end,
-        name_parent_start = "parent_start",
-        name_parent_end = "parent_end",
-        name_interval_number = name_episode_number
+    dat <- tryCatch(
+        add_parent_interval.data.frame(
+            x = x,
+            id = id,
+            start = start,
+            end = end,
+            name_parent_start = "parent_start",
+            name_parent_end = "parent_end",
+            name_interval_number = name_episode_number
+        ),
+        error = function(cnd) {
+            cli_abort("Unable to calculate the parent interval.", parent = cnd)
+        }
     )
 
     # use data.table calculate the start and end by id and episode
