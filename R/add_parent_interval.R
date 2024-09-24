@@ -3,42 +3,67 @@
 #'
 # -------------------------------------------------------------------------
 #' `add_parent_interval()` calculates the minimum spanning interval that
-#' contains overlapping episodes and adds this to the input. Methods are
-#' provided for data.frame like objects.
+#' contains overlapping episodes and adds this to the input.
 #'
 # -------------------------------------------------------------------------
+#' @param ... Further arguments passed to or from other methods.
+#'
 #' @param x
 #'
-#' \R object.
+#' Data frame like object.
 #'
-#' @param id `[character]`
+#' @param id
 #'
-#' Variable in `x` representing the id associated with an episode.
+#' For the default method, vector representing the id associated with the
+#' episode.
 #'
-#' @param start `[character]`
+#' For the data frame methods. a variable in `x` representing the id associated
+#' with an episode.
 #'
-#' Variable in `x` representing the start of the episode.
+#' Multiple names can be provided in which case the combination of these is used
+#' as the unique id (akin to a by/group_by approach).
 #'
-#' Must refer to a variable that is either class `<Date>` or `<POSIXct>`.
+#' @param start `[character]`.
+#'
+#' For the default method, vector representing episode start date/time.
+#'
+#' For the data frame method, a variable in `x` representing the episode start.
+#'
+#' Variable must be a `<Date>` or `<POSIXct>` object.
 #'
 #' @param end `[character]`
 #'
-#' Variable in `x` representing the start of the episode.
+#' For the default method, vector representing episode end date/time.
+#'
+#' For the data frame method, a variable in `x` representing the episode end.
+#'
+#' Variable must be a `<Date>` or `<POSIXct>` object.
 #'
 #' Must refer to a variable that is the same class as `start`.
 #'
-#' @param ...
+#' @param name_id
 #'
-#' Not currently used.
+#' The column name to use for the patient id in the output
+#' [tibble][tibble::tbl_df-class].
 #'
+#' @param name_parent_start
+#'
+#' The column name to use for the start of the parent interval in the output
+#' [tibble][tibble::tbl_df-class].
+#'
+#' @param name_parent_end
+#'
+#' The column name to use for the end of the parent interval in the output
+#' [tibble][tibble::tbl_df-class].
+#'
+#' @param name_interval_number
+#'
+#' The column name to use for the interval number within the matched parent
+#' interval in the output [tibble][tibble::tbl_df-class].
 # -------------------------------------------------------------------------
 #' @return
 #' The input data with additional columns for the corresponding parent interval
-#' (split across `id` values).
-#'
-#' Additional columns will be labelled '.parent_start', '.parent_end' and
-#' '.interval_number' where the interval number is in order of occurrence of
-#' the corresponding parent interval.
+#' (split across the `id` values).
 #'
 #' The returned object will be of the same class as the input `x` (i.e. a
 #' data.frame, data.table or tibble).
@@ -57,103 +82,224 @@
 #'     ))
 #' )
 #'
-#' add_parent_interval(dat)
+#' with(dat, add_parent_interval(id, start, end))
+#' add_parent_interval(dat, id = "id", start = "start", end = "end")
 #'
 # -------------------------------------------------------------------------
 #' @export
-add_parent_interval <- function(x, ...) {
+add_parent_interval <- function(...) {
     UseMethod("add_parent_interval")
 }
 
 # -------------------------------------------------------------------------
 #' @rdname add_parent_interval
+#' @importFrom rlang check_dots_empty0
+#' @importFrom ympes assert_scalar_character_not_na
+#' @importFrom data.table data.table setnames setDF
+#' @importFrom tibble as_tibble
 #' @export
-add_parent_interval.default <- function(x, ...) {
-    stopf("Not implemented for <%s> objects.", toString(class(x)))
-}
+add_parent_interval.default <- function(
+    id,
+    start,
+    end,
+    ...,
+    name_id = "id",
+    name_parent_start = "parent_start",
+    name_parent_end = "parent_end",
+    name_interval_number = "per_id_interval_number"
+) {
 
-# -------------------------------------------------------------------------
-#' @rdname add_parent_interval
-#' @export
-add_parent_interval.data.table <- function(x, id = "id", start = "start", end = "end", ...) {
-    .add_parent_interval(x, id = id, start = start, end = end)
-}
+    check_dots_empty0(...)
 
-# -------------------------------------------------------------------------
-#' @rdname add_parent_interval
-#' @export
-add_parent_interval.tbl_df <- function(x, id = "id", start = "start", end = "end", ...) {
-    if (!requireNamespace("tibble")) {
-        stop("{tibble} is required to use this function. Please install to continue.")
+    # check the output names
+    assert_scalar_character_not_na(name_id)
+    assert_scalar_character_not_na(name_parent_start)
+    assert_scalar_character_not_na(name_parent_end)
+    assert_scalar_character_not_na(name_interval_number)
+
+    names <- c(name_id, name_parent_start, name_parent_end, name_interval_number)
+
+    if (dups <- anyDuplicated(names)) {
+        stop(sprintf(
+            "Output names must be unique. %s is duplicated.",
+            dQuote(names[dups])
+        ))
     }
-    out <- .add_parent_interval(x, id = id, start = start, end = end)
-    tibble::as_tibble(data.table::setDF(out))
+
+    # check start and end are of a valid and identical class
+    identical <- identical(class(start), class(end))
+    valid <- inherits(start, "Date") || inherits(start, "POSIXct")
+    if (!(identical && valid)) {
+        stop("`start` and `end` columns must both be either <Date> or <POSIXct>.")
+    }
+
+    # C API NOTE: .calculate_parent is expecting start/end to be REAL so we
+    #             ensure this is the case.
+    storage.mode(start) <- "double"
+    storage.mode(end) <- "double"
+
+    # check lengths are compatible
+    if (length(id) != length(start) || length(id) != length(end)) {
+        stop("`id`, `start` and `end` must be the same length.")
+    }
+
+    # C API NOTE: .calculate_parent requires us to be ordered by start date
+    #             to work! The key argument here ensures this is the case
+    #             (allowing for id as we will group by this).
+    DT <- data.table(id, start, end, position = seq_along(id), key = c("id", "start"))
+
+    # pull out the position argument so we can return original ordering
+    position <- order(DT$position)
+
+    # calculate the parent interval
+    DT <- DT[, .calculate_parent(start, end), keyby = id]
+
+    # return original ordering
+    DT <- DT[position]
+
+    # Add the desired column names
+    setnames(DT, names)
+
+    # Return as tibble
+    as_tibble(setDF(DT))
 }
 
 # -------------------------------------------------------------------------
 #' @rdname add_parent_interval
+#' @importFrom rlang check_dots_empty0
+#' @importFrom vctrs vec_group_id
+#' @importFrom ympes assert_scalar_character_not_na assert_character
 #' @export
-add_parent_interval.data.frame <- function(x, id = "id", start = "start", end = "end", ...) {
-    out <- .add_parent_interval(x, id = id, start = start, end = end)
-    as.data.frame(out)
+add_parent_interval.data.frame <- function(
+    x,
+    id,
+    start,
+    end,
+    ...,
+    name_parent_start = "parent_start",
+    name_parent_end = "parent_end",
+    name_interval_number = "per_id_interval_number"
+) {
+
+    check_dots_empty0(...)
+
+    # check the input names
+    assert_scalar_character_not_na(start)
+    assert_scalar_character_not_na(end)
+    assert_character(id)
+    if (anyNA(id)) {
+        stop("`id` must be a non-NA character vector.")
+    }
+
+    # check the output names
+    assert_scalar_character_not_na(name_parent_start)
+    assert_scalar_character_not_na(name_parent_end)
+    assert_scalar_character_not_na(name_interval_number)
+
+    output_names <- c(name_parent_start, name_parent_end, name_interval_number)
+
+    if (dups <- anyDuplicated(output_names)) {
+        stop(sprintf(
+            "Output names must be unique. %s is duplicated.",
+            dQuote(output_names[dups])
+        ))
+    }
+
+    # check input data.frame does not use output names
+    x_names <- names(x)
+    matches <- output_names[output_names %in% x_names]
+    if (length(matches)) {
+        stopf(
+            "The output names %s clashes with the column names in `x`. Please choose a different name.",
+            sQuote(matches[1L])
+        )
+    }
+
+    # check that input names are present
+    input_names <- c(id, start, end)
+    matches <- input_names[!input_names %in% x_names]
+    if (length(matches)) {
+        stopf(
+            "Not all inputs are present in `x`. No column named %s can be found.",
+            sQuote(matches[1L])
+        )
+    }
+
+    # id vector
+    length_id <- length(id)
+    if (!length_id) {
+        stop("`id` must be of length one or more.")
+    } else if (length_id != 1L) {
+        id <- vec_group_id(x[id])
+    } else {
+        id <- x[[id]]
+    }
+
+    # start vector
+    start <- x[[start]]
+
+    # end vector
+    end <- x[[end]]
+
+    # calculate the parent intervals
+    # TODO - this could be more efficient as we duplicate some checks
+    dat <- add_parent_interval.default(
+        id = id,
+        start = start,
+        end = end,
+        name_id = "id",
+        name_parent_start = name_parent_start,
+        name_parent_end = name_parent_end,
+        name_interval_number = name_interval_number
+    )
+
+    # drop the id column and combine with the input
+    dat$id <- NULL
+    cbind(x, dat)
 }
 
+# -------------------------------------------------------------------------
+#' @rdname add_parent_interval
+#' @importFrom data.table setDT
+#' @export
+add_parent_interval.data.table <- function(
+    x,
+    id,
+    start,
+    end,
+    ...,
+    name_parent_start = "parent_start",
+    name_parent_end = "parent_end",
+    name_interval_number = "per_id_interval_number"
+) {
+    x <- as.data.frame(x)
+    out <- NextMethod()
+    setDT(out)[]
+}
+
+# -------------------------------------------------------------------------
+#' @rdname add_parent_interval
+#' @importFrom tibble as_tibble
+#' @export
+add_parent_interval.tbl_df <- function(
+    x,
+    id,
+    start,
+    end,
+    ...,
+    name_parent_start = "parent_start",
+    name_parent_end = "parent_end",
+    name_interval_number = "per_id_interval_number"
+) {
+    out <- NextMethod()
+    as_tibble(out)
+}
 
 # ------------------------------------------------------------------------- #
 # ------------------------------------------------------------------------- #
 # -------------------------------- INTERNALS ------------------------------ #
 # ------------------------------------------------------------------------- #
 # ------------------------------------------------------------------------- #
-.add_parent_interval <- function(x, id, start, end, call = sys.call(-1L)) {
-
-    .position <- NULL # for CRAN package checks
-
-    # check input data.frame does not used reserved names
-    # TODO - this could be better but will suffice for time being
-    reserved <- c(".position", ".parent_start", ".parent_end", ".interval_number")
-    nms <- names(x)
-    matches <- nms[nms %in% reserved]
-    if (length(matches)) {
-        stopf(
-            "`x` cannot have a column named %s for this function to work",
-            sQuote(matches[1L])
-        )
-    }
-
-    # check specified columns are present
-    vars <- c(id, start, end)
-    present <- vars %in% nms
-    if (any(!present)) {
-        v <- vars[!present][1]
-        stopf("%s is not a column in `x`", sQuote(v), .call = call)
-    }
-
-    # check start and end are of a valid and identical class
-    vec_start <- .subset2(x, start)
-    vec_end <- .subset2(x, end)
-    start_cond <- !inherits(vec_start, "Date") && !inherits(vec_start, "POSIXct")
-    end_cond <- !inherits(vec_end, "Date") && !inherits(vec_end, "POSIXct")
-    i_cond <- !identical(class(vec_start), class(vec_end))
-    if (start_cond || end_cond || i_cond) {
-        stopf("`start` and `end` columns must both be either <Date> or <POSIXct>.")
-    }
-
-    # Ensure input is data.table
-    DT <- as.data.table(x)
-
-    # add position column so we can return original ordering
-    DT[, .position := .I]
-
-    # .calculate_parent requires us to be ordered by start date to work
-    setorderv(DT, cols = c(id, start))
-    DT[,c(".parent_start", ".parent_end", ".interval_number") :=
-           .calculate_parent(start, end), keyby = c(id)]
-
-    # return original ordering
-    setorder(DT, .position)
-    DT[,.position :=NULL]
-}
-
 .calculate_parent <- function(start, end) {
     .Call("calculate_parent", start, end)
 }

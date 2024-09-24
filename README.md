@@ -123,18 +123,18 @@ end2 <- start2 + sample(1:100, size = n * 5, replace = TRUE)
 # creates the object big_dat and shows the first 10 rows as a tibble in the console
 (big_dat <- tibble(id = id2, start = start2, end = end2))
 #> # A tibble: 625,000 × 3
-#>       id start      end       
-#>    <int> <date>     <date>    
-#>  1 90983 2020-02-07 2020-03-18
-#>  2 59640 2020-07-05 2020-08-13
-#>  3 29543 2020-04-05 2020-05-28
-#>  4 17962 2020-06-07 2020-07-21
-#>  5 13032 2020-08-25 2020-09-08
-#>  6 94348 2020-05-11 2020-06-07
-#>  7  7770 2020-03-18 2020-04-03
-#>  8  9570 2020-09-25 2020-12-04
-#>  9 86687 2020-11-04 2021-01-09
-#> 10 66213 2020-04-09 2020-04-16
+#>        id start      end       
+#>     <int> <date>     <date>    
+#>  1   2894 2020-10-24 2020-10-30
+#>  2  31622 2020-03-15 2020-05-21
+#>  3   7950 2020-03-01 2020-05-27
+#>  4 105989 2020-10-29 2020-11-27
+#>  5  41267 2020-09-10 2020-09-20
+#>  6  35345 2020-05-07 2020-08-07
+#>  7  72716 2020-10-20 2021-01-25
+#>  8  53240 2020-08-16 2020-08-21
+#>  9 117062 2020-08-27 2020-10-19
+#> 10 119766 2020-06-23 2020-08-23
 #> # ℹ 624,990 more rows
 
 # checking the time to run
@@ -145,7 +145,7 @@ system.time(
         reframe(interval = iv_groups(interval, abutting = FALSE), .by = id)
 )
 #>    user  system elapsed 
-#>  13.870   0.065  13.996
+#>  14.092   0.061  14.206
 ```
 
 If you were not already using it, this is likely the time you would
@@ -172,36 +172,36 @@ fun <- function(s, e) {
 
 system.time(out_dt <- DT[, fun(start, end + 1), by = id])
 #>    user  system elapsed 
-#>  14.972   0.022  14.984
+#>  15.050   0.005  15.015
 ```
 
 ***NHSRepisodes*** solves this with the `merge_episodes()` function:
 
 ``` r
-merge_episodes(big_dat)
-#> # A tibble: 334,767 × 4
-#>       id .interval_number .episode_start .episode_end
-#>    <int>            <int> <date>         <date>      
-#>  1     1                1 2020-04-16     2020-06-23  
-#>  2     2                1 2020-01-12     2020-02-22  
-#>  3     2                2 2020-07-22     2020-08-16  
-#>  4     2                3 2020-09-27     2021-01-11  
-#>  5     3                1 2020-01-06     2020-03-02  
-#>  6     3                2 2020-03-08     2020-03-16  
-#>  7     3                3 2020-06-05     2020-08-26  
-#>  8     4                1 2020-02-05     2020-05-03  
-#>  9     4                2 2020-05-19     2020-09-08  
-#> 10     5                1 2020-01-14     2020-03-13  
-#> # ℹ 334,757 more rows
+merge_episodes(big_dat, id = "id", start = "start", end = "end")
+#> # A tibble: 335,998 × 4
+#>       id episode_number episode_start episode_end
+#>    <int>          <int> <date>        <date>     
+#>  1     1              1 2020-01-15    2020-03-19 
+#>  2     1              2 2020-03-31    2020-06-22 
+#>  3     1              3 2020-06-24    2020-07-01 
+#>  4     1              4 2020-08-16    2020-10-04 
+#>  5     1              5 2020-10-15    2021-01-09 
+#>  6     2              1 2020-02-04    2020-05-19 
+#>  7     2              2 2020-08-22    2020-10-18 
+#>  8     2              3 2020-11-01    2021-01-08 
+#>  9     3              1 2020-04-11    2020-04-20 
+#> 10     3              2 2020-05-25    2020-11-13 
+#> # ℹ 335,988 more rows
 
 # And for comparison with earlier timings
-system.time(out <- merge_episodes(big_dat))
+system.time(out <- merge_episodes(big_dat, id = "id", start = "start", end = "end"))
 #>    user  system elapsed 
-#>   0.917   0.000   0.335
+#>   0.795   0.000   0.352
 
 # equal output (subject to ordering)
 out <- out |> 
-    mutate(interval = iv(start = .episode_start, end = .episode_end + 1)) |> 
+    mutate(interval = iv(start = episode_start, end = episode_end + 1)) |> 
     select(id, interval)
 
 out_dplyr <- arrange(out_dplyr, id, interval)
@@ -224,16 +224,16 @@ the the minimum spanning interval with each observation without reducing
 to the unique values:
 
 ``` r
-add_parent_interval(dat)
+add_parent_interval(dat, id = "id", start = "start", end = "end")
 #> # A tibble: 8 × 6
-#>      id start      end        .parent_start .parent_end .interval_number
-#>   <int> <date>     <date>     <date>        <date>                 <int>
-#> 1     1 2020-01-01 2020-01-10 2020-01-01    2020-01-10                 1
-#> 2     1 2020-01-03 2020-01-10 2020-01-01    2020-01-10                 1
-#> 3     2 2020-04-01 2020-04-30 2020-04-01    2020-04-30                 1
-#> 4     2 2020-04-15 2020-04-16 2020-04-01    2020-04-30                 1
-#> 5     2 2020-04-17 2020-04-19 2020-04-01    2020-04-30                 1
-#> 6     1 2020-05-01 2020-10-01 2020-05-01    2020-10-01                 3
-#> 7     1 2020-01-01 2020-01-10 2020-01-01    2020-01-10                 1
-#> 8     1 2020-01-11 2020-01-12 2020-01-11    2020-01-12                 2
+#>      id start      end        parent_start parent_end per_id_interval_number
+#>   <int> <date>     <date>     <date>       <date>                      <int>
+#> 1     1 2020-01-01 2020-01-10 2020-01-01   2020-01-10                      1
+#> 2     1 2020-01-03 2020-01-10 2020-01-01   2020-01-10                      1
+#> 3     2 2020-04-01 2020-04-30 2020-04-01   2020-04-30                      1
+#> 4     2 2020-04-15 2020-04-16 2020-04-01   2020-04-30                      1
+#> 5     2 2020-04-17 2020-04-19 2020-04-01   2020-04-30                      1
+#> 6     1 2020-05-01 2020-10-01 2020-05-01   2020-10-01                      3
+#> 7     1 2020-01-01 2020-01-10 2020-01-01   2020-01-10                      1
+#> 8     1 2020-01-11 2020-01-12 2020-01-11   2020-01-12                      2
 ```

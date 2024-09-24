@@ -149,14 +149,14 @@ system.time(out_dt <- DT[, fun(start, end + 1), by = id])
 ***NHSRepisodes*** solves this with the `merge_episodes()` function:
 
 ```{r}
-merge_episodes(big_dat)
+merge_episodes(big_dat, id = "id", start = "start", end = "end")
 
 # And for comparison with earlier timings
-system.time(out <- merge_episodes(big_dat))
+system.time(out <- merge_episodes(big_dat, id = "id", start = "start", end = "end"))
 
 # equal output (subject to ordering)
 out <- out |> 
-    mutate(interval = iv(start = .episode_start, end = .episode_end + 1)) |> 
+    mutate(interval = iv(start = episode_start, end = episode_end + 1)) |> 
     select(id, interval)
 
 out_dplyr <- arrange(out_dplyr, id, interval)
@@ -177,5 +177,5 @@ the minimum spanning interval with each observation without reducing to the
 unique values:
 
 ```{r}
-add_parent_interval(dat)
+add_parent_interval(dat, id = "id", start = "start", end = "end")
 ```

@@ -7,6 +7,5 @@
 ## usethis namespace: end
 NULL
 
-#' @import data.table
 #' @useDynLib NHSRepisodes, .registration = TRUE
 NULL

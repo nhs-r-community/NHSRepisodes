@@ -1,4 +1,8 @@
 test_that("merge_episodes works on a small set of values", {
+
+    skip_if_not_installed("dplyr", minimum_version = "1.1.0")
+    skip_if_not_installed("ivs")
+
     id <- c(1, 1, 2, 2, 2, 1)
     start <- as.Date(c(
         "2020-01-01",
@@ -26,8 +30,8 @@ test_that("merge_episodes works on a small set of values", {
         dplyr::arrange(id, interval)
 
     out1b <- dat1 |>
-        merge_episodes() |>
-        dplyr::mutate(interval = ivs::iv(start = .episode_start, end = .episode_end + 1)) |>
+        merge_episodes(id = "id", start = "start", end = "end") |>
+        dplyr::mutate(interval = ivs::iv(start = episode_start, end = episode_end + 1)) |>
         dplyr::select(id, interval)
 
     expect_identical(out1a, out1b)
@@ -41,18 +45,24 @@ test_that("merge_episodes works on a small set of values", {
         dplyr::arrange(id, interval)
 
     out2b <- dat2 |>
-        merge_episodes() |>
-        dplyr::mutate(interval = ivs::iv(start = .episode_start, end = .episode_end + 1)) |>
+        merge_episodes(id = "id", start = "start", end = "end") |>
+        dplyr::mutate(interval = ivs::iv(start = episode_start, end = episode_end + 1)) |>
         dplyr::select(id, interval)
 
     expect_identical(out2a, out2b)
 
     # snapshot for comparison
-    expect_snapshot_output(merge_episodes(dat1))
+    expect_snapshot_output(
+        merge_episodes(dat1, id = "id", start = "start", end = "end")
+    )
 })
 
 
 test_that("merge_episodes works on a large set of values", {
+
+    skip_if_not_installed("dplyr", "1.1.0")
+    skip_if_not_installed("ivs")
+
     set.seed(99)
     n <- 10000
     id <- sample(seq_len(n), size = n * 5, replace = TRUE)
@@ -68,8 +78,8 @@ test_that("merge_episodes works on a large set of values", {
         dplyr::arrange(id, interval)
 
     out1b <- dat1 |>
-        merge_episodes() |>
-        dplyr::mutate(interval = ivs::iv(start = .episode_start, end = .episode_end + 1)) |>
+        merge_episodes(id = "id", start = "start", end = "end") |>
+        dplyr::mutate(interval = ivs::iv(start = episode_start, end = episode_end + 1)) |>
         dplyr::select(id, interval)
 
     expect_identical(out1a, out1b)
@@ -83,8 +93,8 @@ test_that("merge_episodes works on a large set of values", {
         dplyr::arrange(id, interval)
 
     out2b <- dat2 |>
-        merge_episodes() |>
-        dplyr::mutate(interval = ivs::iv(start = .episode_start, end = .episode_end + 1)) |>
+        merge_episodes(id = "id", start = "start", end = "end") |>
+        dplyr::mutate(interval = ivs::iv(start = episode_start, end = episode_end + 1)) |>
         dplyr::select(id, interval)
 
     expect_identical(out2a, out2b)

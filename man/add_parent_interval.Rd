@@ -3,57 +3,111 @@
 \name{add_parent_interval}
 \alias{add_parent_interval}
 \alias{add_parent_interval.default}
+\alias{add_parent_interval.data.frame}
 \alias{add_parent_interval.data.table}
 \alias{add_parent_interval.tbl_df}
-\alias{add_parent_interval.data.frame}
 \title{Calculate parent intervals}
 \usage{
-add_parent_interval(x, ...)
+add_parent_interval(...)
 
-\method{add_parent_interval}{default}(x, ...)
+\method{add_parent_interval}{default}(
+  id,
+  start,
+  end,
+  ...,
+  name_id = "id",
+  name_parent_start = "parent_start",
+  name_parent_end = "parent_end",
+  name_interval_number = "per_id_interval_number"
+)
 
-\method{add_parent_interval}{data.table}(x, id = "id", start = "start", end = "end", ...)
+\method{add_parent_interval}{data.frame}(
+  x,
+  id,
+  start,
+  end,
+  ...,
+  name_parent_start = "parent_start",
+  name_parent_end = "parent_end",
+  name_interval_number = "per_id_interval_number"
+)
 
-\method{add_parent_interval}{tbl_df}(x, id = "id", start = "start", end = "end", ...)
+\method{add_parent_interval}{data.table}(
+  x,
+  id,
+  start,
+  end,
+  ...,
+  name_parent_start = "parent_start",
+  name_parent_end = "parent_end",
+  name_interval_number = "per_id_interval_number"
+)
 
-\method{add_parent_interval}{data.frame}(x, id = "id", start = "start", end = "end", ...)
+\method{add_parent_interval}{tbl_df}(
+  x,
+  id,
+  start,
+  end,
+  ...,
+  name_parent_start = "parent_start",
+  name_parent_end = "parent_end",
+  name_interval_number = "per_id_interval_number"
+)
 }
 \arguments{
-\item{x}{\R object.}
+\item{...}{Further arguments passed to or from other methods.}
 
-\item{...}{Not currently used.}
+\item{id}{For the default method, vector representing the id associated with the
+episode.
 
-\item{id}{\verb{[character]}
+For the data frame methods. a variable in \code{x} representing the id associated
+with an episode.
 
-Variable in \code{x} representing the id associated with an episode.}
+Multiple names can be provided in which case the combination of these is used
+as the unique id (akin to a by/group_by approach).}
 
-\item{start}{\verb{[character]}
+\item{start}{\verb{[character]}.
 
-Variable in \code{x} representing the start of the episode.
+For the default method, vector representing episode start date/time.
 
-Must refer to a variable that is either class \verb{<Date>} or \verb{<POSIXct>}.}
+For the data frame method, a variable in \code{x} representing the episode start.
+
+Variable must be a \verb{<Date>} or \verb{<POSIXct>} object.}
 
 \item{end}{\verb{[character]}
 
-Variable in \code{x} representing the start of the episode.
+For the default method, vector representing episode end date/time.
+
+For the data frame method, a variable in \code{x} representing the episode end.
+
+Variable must be a \verb{<Date>} or \verb{<POSIXct>} object.
 
 Must refer to a variable that is the same class as \code{start}.}
+
+\item{name_id}{The column name to use for the patient id in the output
+\link[tibble:tbl_df-class]{tibble}.}
+
+\item{name_parent_start}{The column name to use for the start of the parent interval in the output
+\link[tibble:tbl_df-class]{tibble}.}
+
+\item{name_parent_end}{The column name to use for the end of the parent interval in the output
+\link[tibble:tbl_df-class]{tibble}.}
+
+\item{name_interval_number}{The column name to use for the interval number within the matched parent
+interval in the output \link[tibble:tbl_df-class]{tibble}.}
+
+\item{x}{Data frame like object.}
 }
 \value{
 The input data with additional columns for the corresponding parent interval
-(split across \code{id} values).
-
-Additional columns will be labelled '.parent_start', '.parent_end' and
-'.interval_number' where the interval number is in order of occurrence of
-the corresponding parent interval.
+(split across the \code{id} values).
 
 The returned object will be of the same class as the input \code{x} (i.e. a
 data.frame, data.table or tibble).
 }
 \description{
 \code{add_parent_interval()} calculates the minimum spanning interval that
-contains overlapping episodes and adds this to the input. Methods are
-provided for data.frame like objects.
+contains overlapping episodes and adds this to the input.
 }
 \examples{
 dat <- data.frame(
@@ -68,6 +122,7 @@ dat <- data.frame(
     ))
 )
 
-add_parent_interval(dat)
+with(dat, add_parent_interval(id, start, end))
+add_parent_interval(dat, id = "id", start = "start", end = "end")
 
 }

@@ -1,6 +1,6 @@
 Package: NHSRepisodes
 Title: Package Relating to Hospital Episode Intervals
-Version: 0.1.0.9000
+Version: 0.1.0.9001
 Authors@R: 
     c(person(given = "Zoë",
              family = "Turner",
@@ -20,12 +20,15 @@ Description: Hospital episodes can overlap or have gaps which can result in
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 Imports:
-    data.table
-Suggests: 
+    data.table,
+    rlang,
+    tibble,
+    vctrs,
+    ympes
+Suggests:
     dplyr,
     ivs,
     testthat (>= 3.0.0),
-    tibble
 Config/testthat/edition: 3

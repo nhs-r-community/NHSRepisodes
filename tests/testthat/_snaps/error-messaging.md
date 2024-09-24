@@ -1,16 +1,51 @@
-# error messaging works
+# error messaging for add_parent_interval works
 
-    Not implemented for <character> objects.
-
----
-
-    Not implemented for <character> objects.
-
----
-
-    'end' is not a column in `x`
+    Code
+      add_parent_interval(dat)
+    Condition
+      Error in `add_parent_interval.data.frame()`:
+      ! argument `start` is missing, with no default.
 
 ---
 
-    `start` and `end` columns must both be either <Date> or <POSIXct>.
+    Code
+      add_parent_interval(dat, id = "bob", start = "start", end = "end")
+    Condition
+      Error in `add_parent_interval.data.frame()`:
+      ! Not all inputs are present in `x`. No column named 'bob' can be found.
+
+---
+
+    Code
+      add_parent_interval(dat, id = "id", start = "bob", end = "end")
+    Condition
+      Error in `add_parent_interval.data.frame()`:
+      ! Not all inputs are present in `x`. No column named 'bob' can be found.
+
+---
+
+    Code
+      add_parent_interval(dat, id = "id", start = "start", end = "bob")
+    Condition
+      Error in `add_parent_interval.data.frame()`:
+      ! Not all inputs are present in `x`. No column named 'bob' can be found.
+
+---
+
+    Code
+      add_parent_interval(dat, id = "id", start = "start", end = "end",
+        name_parent_start = "parent_end")
+    Condition
+      Error in `add_parent_interval.data.frame()`:
+      ! Output names must be unique. "parent_end" is duplicated.
+
+---
+
+    Code
+      add_parent_interval(dat, id = "id", start = "start", end = "end", bob = "bob")
+    Condition
+      Error in `add_parent_interval()`:
+      ! `...` must be empty.
+      x Problematic argument:
+      * bob = "bob"
 

@@ -3,33 +3,60 @@
 #'
 # -------------------------------------------------------------------------
 #' `merge_episodes()` combines overlapping episodes in to a minimal spanning
-#' interval split by in individual identifier. Methods are provided for
-#' data.frame like objects.
+#' interval split by in individual identifier.
 #'
 # -------------------------------------------------------------------------
+#' @param ... Further arguments passed to or from other methods.
+#'
 #' @param x
 #'
-#' \R object.
+#' Data frame like object.
 #'
-#' @param id `[character]`
+#' @param id
 #'
-#' Variable in `x` representing the id associated with the episode.
+#' For the default method, vector representing the id associated with the
+#' episode.
 #'
-#' @param start `[character]`
+#' For the data frame method, a variable in `x` representing the id associated
+#' with the episode.
 #'
-#' Variable in `x` representing the start of the episode.
+#' @param start
 #'
-#' Must refer to a variable that is either class `<Date>` or `<POSIXct>`.
+#' For the default method, vector representing episode start date/time.
 #'
-#' @param end `[character]`
+#' For the data frame method, a variable in `x` representing the episode start.
 #'
-#' Variable in `x` representing the start of the episode.
+#' Variable must be a `<Date>` or `<POSIXct>` object.
+#'
+#' @param end
+#'
+#' For the default method, vector representing episode end date/time.
+#'
+#' For the data frame method, a variable in `x` representing the episode end.
+#'
+#' Variable must be a `<Date>` or `<POSIXct>` object.
 #'
 #' Must refer to a variable that is the same class as `start`.
 #'
-#' @param ...
+#' @param name_id
 #'
-#' Not currently used.
+#' The column name to use for the patient id in the output
+#' [tibble][tibble::tbl_df-class].
+#'
+#' @param name_episode_start
+#'
+#' The column name to use for the start of the episode in the output
+#' [tibble][tibble::tbl_df-class].
+#'
+#' @param name_episode_end
+#'
+#' The column name to use for the end of the episode in the output
+#' [tibble][tibble::tbl_df-class].
+#'
+#' @param name_episode_number
+#'
+#' The column name to use for the episode number of an individual patient in the
+#' output [tibble][tibble::tbl_df-class].
 #'
 # -------------------------------------------------------------------------
 #' @return
@@ -54,63 +81,143 @@
 #'     ))
 #' )
 #'
-#' merge_episodes(dat)
+#' with(dat, merge_episodes(id, start, end))
+#' merge_episodes(dat, id = "id", start = "start", end = "end")
 #'
 # -------------------------------------------------------------------------
 #' @export
-merge_episodes <- function(x, ...) {
+merge_episodes <- function(...) {
     UseMethod("merge_episodes")
 }
 
 # -------------------------------------------------------------------------
 #' @rdname merge_episodes
+#' @importFrom rlang check_dots_empty0
+#' @importFrom data.table setDT setnames setorderv setDF
 #' @export
-merge_episodes.default <- function(x, ...) {
-    stopf("Not implemented for <%s> objects.", toString(class(x)))
-}
+merge_episodes.default <- function(
+    id,
+    start,
+    end,
+    ...,
+    name_id = "id",
+    name_episode_start = "episode_start",
+    name_episode_end = "episode_end",
+    name_episode_number = "episode_number"
+) {
 
-# -------------------------------------------------------------------------
-#' @rdname merge_episodes
-#' @export
-merge_episodes.data.table <- function(x, id = "id", start = "start", end = "end", ...) {
-    .merge_episodes(x, id = id, start = start, end = end)
-}
+    # for CRAN checks due to NSE
+    . <- parent_start <- parent_end <- NULL
 
-# -------------------------------------------------------------------------
-#' @rdname merge_episodes
-#' @export
-merge_episodes.tbl_df <- function(x, id = "id", start = "start", end = "end", ...) {
-    if (!requireNamespace("tibble")) {
-        stop("{tibble} is required to use this function. Please install to continue.")
-    }
-    DT <- .merge_episodes(x, id = id, start = start, end = end)
-    tibble::as_tibble(data.table::setDF(DT))
-}
+    check_dots_empty0(...)
 
-# -------------------------------------------------------------------------
-#' @rdname merge_episodes
-#' @export
-merge_episodes.data.frame <- function(x, id = "id", start = "start", end = "end", ...) {
-    DT <- .merge_episodes(x, id = id, start = start, end = end)
-    as.data.frame(DT)
-}
-
-# ------------------------------------------------------------------------- #
-# ------------------------------------------------------------------------- #
-# -------------------------------- INTERNALS ------------------------------ #
-# ------------------------------------------------------------------------- #
-# ------------------------------------------------------------------------- #
-.merge_episodes <- function(x, id, start, end) {
-    . <- .parent_start <- .parent_end <- NULL # for CRAN package checks
-    DT <- .add_parent_interval(
-        x,
+    # calculate the parent interval
+    dat <- add_parent_interval(
         id = id,
         start = start,
         end = end,
-        call = sys.call(-1L)
+        name_id = name_id,
+        name_parent_start = "parent_start",
+        name_parent_end = "parent_end",
+        name_interval_number = name_episode_number
     )
-    DT <- DT[,
-       .(.episode_start = min(.parent_start), .episode_end = max(.parent_end)),
-       by = c(id, ".interval_number")]
-    setorderv(DT, c(id, ".episode_start"))
+
+    # use data.table calculate the start and end by id and episode
+    setDT(dat)
+    dat <- dat[,
+        .(episode_start = min(parent_start), episode_end = max(parent_end)),
+        by = c(name_id, name_episode_number)]
+
+    # update names
+    setnames(
+        dat,
+        old = c("episode_start", "episode_end"),
+        new = c(name_episode_start, name_episode_end)
+    )
+
+    # order first by id and then start
+    setorderv(dat, c(name_id, name_episode_start))
+
+    # return as tibble
+    tibble::as_tibble(setDF(dat))
+}
+
+# -------------------------------------------------------------------------
+#' @rdname merge_episodes
+#' @importFrom rlang check_dots_empty0
+#' @importFrom data.table setDT setnames setorderv setDF
+#' @export
+merge_episodes.data.frame <- function(
+    x,
+    id,
+    start,
+    end,
+    ...,
+    name_episode_start = "episode_start",
+    name_episode_end = "episode_end",
+    name_episode_number = "episode_number"
+) {
+
+    # for CRAN checks due to NSE
+    . <- parent_start <- parent_end <- NULL
+
+    rlang::check_dots_empty0(...)
+
+    # add the parent interval
+    dat <- add_parent_interval.data.frame(
+        x = x,
+        id = id,
+        start = start,
+        end = end,
+        name_parent_start = "parent_start",
+        name_parent_end = "parent_end",
+        name_interval_number = name_episode_number
+    )
+
+    # use data.table calculate the start and end by id and episode
+    setDT(dat)
+    dat <- dat[,
+               .(episode_start = min(parent_start), episode_end = max(parent_end)),
+               by = c(id, name_episode_number)]
+
+    # update names
+    setnames(
+        dat,
+        old = c("episode_start", "episode_end"),
+        new = c(name_episode_start, name_episode_end)
+    )
+
+    # order first by id and then start
+    setorderv(dat, c(id, name_episode_start))
+
+    # return as data frame
+    setDF(dat)[]
+}
+
+# -------------------------------------------------------------------------
+#' @rdname merge_episodes
+#' @importFrom data.table setDT
+#' @export
+merge_episodes.data.table <- function(
+    x,
+    id,
+    start,
+    end,
+    ...,
+    name_episode_start = "episode_start",
+    name_episode_end = "episode_end",
+    name_episode_number = "episode_number"
+) {
+    x <- as.data.frame(x)
+    out <- NextMethod()
+    setDT(out)[]
+}
+
+# -------------------------------------------------------------------------
+#' @rdname merge_episodes
+#' @importFrom tibble as_tibble
+#' @export
+merge_episodes.tbl_df <- function(x, id = "id", start = "start", end = "end", ...) {
+    out <- NextMethod()
+    as_tibble(out)
 }

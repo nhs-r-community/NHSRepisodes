@@ -3,41 +3,84 @@
 \name{merge_episodes}
 \alias{merge_episodes}
 \alias{merge_episodes.default}
+\alias{merge_episodes.data.frame}
 \alias{merge_episodes.data.table}
 \alias{merge_episodes.tbl_df}
-\alias{merge_episodes.data.frame}
 \title{Merge overlapping episodes}
 \usage{
-merge_episodes(x, ...)
+merge_episodes(...)
 
-\method{merge_episodes}{default}(x, ...)
+\method{merge_episodes}{default}(
+  id,
+  start,
+  end,
+  ...,
+  name_id = "id",
+  name_episode_start = "episode_start",
+  name_episode_end = "episode_end",
+  name_episode_number = "episode_number"
+)
 
-\method{merge_episodes}{data.table}(x, id = "id", start = "start", end = "end", ...)
+\method{merge_episodes}{data.frame}(
+  x,
+  id,
+  start,
+  end,
+  ...,
+  name_episode_start = "episode_start",
+  name_episode_end = "episode_end",
+  name_episode_number = "episode_number"
+)
+
+\method{merge_episodes}{data.table}(
+  x,
+  id,
+  start,
+  end,
+  ...,
+  name_episode_start = "episode_start",
+  name_episode_end = "episode_end",
+  name_episode_number = "episode_number"
+)
 
 \method{merge_episodes}{tbl_df}(x, id = "id", start = "start", end = "end", ...)
-
-\method{merge_episodes}{data.frame}(x, id = "id", start = "start", end = "end", ...)
 }
 \arguments{
-\item{x}{\R object.}
+\item{...}{Further arguments passed to or from other methods.}
 
-\item{...}{Not currently used.}
+\item{id}{For the default method, vector representing the id associated with the
+episode.
 
-\item{id}{\verb{[character]}
+For the data frame method, a variable in \code{x} representing the id associated
+with the episode.}
 
-Variable in \code{x} representing the id associated with the episode.}
+\item{start}{For the default method, vector representing episode start date/time.
 
-\item{start}{\verb{[character]}
+For the data frame method, a variable in \code{x} representing the episode start.
 
-Variable in \code{x} representing the start of the episode.
+Variable must be a \verb{<Date>} or \verb{<POSIXct>} object.}
 
-Must refer to a variable that is either class \verb{<Date>} or \verb{<POSIXct>}.}
+\item{end}{For the default method, vector representing episode end date/time.
 
-\item{end}{\verb{[character]}
+For the data frame method, a variable in \code{x} representing the episode end.
 
-Variable in \code{x} representing the start of the episode.
+Variable must be a \verb{<Date>} or \verb{<POSIXct>} object.
 
 Must refer to a variable that is the same class as \code{start}.}
+
+\item{name_id}{The column name to use for the patient id in the output
+\link[tibble:tbl_df-class]{tibble}.}
+
+\item{name_episode_start}{The column name to use for the start of the episode in the output
+\link[tibble:tbl_df-class]{tibble}.}
+
+\item{name_episode_end}{The column name to use for the end of the episode in the output
+\link[tibble:tbl_df-class]{tibble}.}
+
+\item{name_episode_number}{The column name to use for the episode number of an individual patient in the
+output \link[tibble:tbl_df-class]{tibble}.}
+
+\item{x}{Data frame like object.}
 }
 \value{
 The resulting combined episode intervals split by id and ordered by interval
@@ -48,8 +91,7 @@ data.frame, data.table or tibble).
 }
 \description{
 \code{merge_episodes()} combines overlapping episodes in to a minimal spanning
-interval split by in individual identifier. Methods are provided for
-data.frame like objects.
+interval split by in individual identifier.
 }
 \examples{
 dat <- data.frame(
@@ -64,6 +106,7 @@ dat <- data.frame(
     ))
 )
 
-merge_episodes(dat)
+with(dat, merge_episodes(id, start, end))
+merge_episodes(dat, id = "id", start = "start", end = "end")
 
 }
