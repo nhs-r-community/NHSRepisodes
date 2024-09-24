@@ -53,7 +53,7 @@ mutate(tibble(packages), version = sapply(packages, getNamespaceVersion))
 #> # A tibble: 4 × 2
 #>   packages     version   
 #>   <chr>        <chr>     
-#> 1 NHSRepisodes 0.1.0.9000
+#> 1 NHSRepisodes 0.1.0.9001
 #> 2 dplyr        1.1.4.9000
 #> 3 data.table   1.16.0    
 #> 4 ivs          0.2.0
@@ -125,16 +125,16 @@ end2 <- start2 + sample(1:100, size = n * 5, replace = TRUE)
 #> # A tibble: 625,000 × 3
 #>        id start      end       
 #>     <int> <date>     <date>    
-#>  1   2894 2020-10-24 2020-10-30
-#>  2  31622 2020-03-15 2020-05-21
-#>  3   7950 2020-03-01 2020-05-27
-#>  4 105989 2020-10-29 2020-11-27
-#>  5  41267 2020-09-10 2020-09-20
-#>  6  35345 2020-05-07 2020-08-07
-#>  7  72716 2020-10-20 2021-01-25
-#>  8  53240 2020-08-16 2020-08-21
-#>  9 117062 2020-08-27 2020-10-19
-#> 10 119766 2020-06-23 2020-08-23
+#>  1  71200 2020-02-20 2020-04-14
+#>  2  95995 2020-08-15 2020-10-05
+#>  3  82944 2020-02-26 2020-03-17
+#>  4  32062 2020-02-22 2020-03-12
+#>  5  13384 2020-03-10 2020-03-13
+#>  6  48814 2020-02-29 2020-05-21
+#>  7   1743 2020-08-26 2020-12-01
+#>  8  74726 2020-03-27 2020-05-19
+#>  9 115267 2020-01-26 2020-04-15
+#> 10   9166 2020-11-04 2020-11-12
 #> # ℹ 624,990 more rows
 
 # checking the time to run
@@ -145,7 +145,7 @@ system.time(
         reframe(interval = iv_groups(interval, abutting = FALSE), .by = id)
 )
 #>    user  system elapsed 
-#>  14.092   0.061  14.206
+#>  14.184   0.060  14.302
 ```
 
 If you were not already using it, this is likely the time you would
@@ -172,32 +172,32 @@ fun <- function(s, e) {
 
 system.time(out_dt <- DT[, fun(start, end + 1), by = id])
 #>    user  system elapsed 
-#>  15.050   0.005  15.015
+#>  15.272   0.011  15.241
 ```
 
 ***NHSRepisodes*** solves this with the `merge_episodes()` function:
 
 ``` r
 merge_episodes(big_dat, id = "id", start = "start", end = "end")
-#> # A tibble: 335,998 × 4
+#> # A tibble: 335,632 × 4
 #>       id episode_number episode_start episode_end
 #>    <int>          <int> <date>        <date>     
-#>  1     1              1 2020-01-15    2020-03-19 
-#>  2     1              2 2020-03-31    2020-06-22 
-#>  3     1              3 2020-06-24    2020-07-01 
-#>  4     1              4 2020-08-16    2020-10-04 
-#>  5     1              5 2020-10-15    2021-01-09 
-#>  6     2              1 2020-02-04    2020-05-19 
-#>  7     2              2 2020-08-22    2020-10-18 
-#>  8     2              3 2020-11-01    2021-01-08 
-#>  9     3              1 2020-04-11    2020-04-20 
-#> 10     3              2 2020-05-25    2020-11-13 
-#> # ℹ 335,988 more rows
+#>  1     1              1 2020-04-07    2020-04-29 
+#>  2     1              2 2020-06-30    2020-07-08 
+#>  3     1              3 2020-09-11    2020-09-24 
+#>  4     2              1 2020-06-04    2020-06-26 
+#>  5     2              2 2020-09-23    2020-10-17 
+#>  6     2              3 2020-10-30    2021-01-22 
+#>  7     3              1 2020-03-03    2020-08-11 
+#>  8     3              2 2020-09-26    2021-03-17 
+#>  9     4              1 2020-03-11    2020-07-15 
+#> 10     4              2 2020-09-02    2020-10-12 
+#> # ℹ 335,622 more rows
 
 # And for comparison with earlier timings
 system.time(out <- merge_episodes(big_dat, id = "id", start = "start", end = "end"))
 #>    user  system elapsed 
-#>   0.795   0.000   0.352
+#>   0.840   0.000   0.404
 
 # equal output (subject to ordering)
 out <- out |> 
