@@ -5,6 +5,11 @@
   in the previous release, `merge_episodes(dat)` would have defaults "id",
   "start" and "end" for the `id`, `start` and `end` arguments, this would now be
   written as `merge_episodes(dat, "id", "start", "end")`.
+  
+- **BREAKING CHANGE**: For both `merge_episodes()` and `add_parent_interval()`,
+  users can now control the output column names. These arguments have been given
+  slightly different defaults to what was set automatically in the previous
+  version (hence the breaking change warning).
 
 - More generally both the `merge_episodes()` and `add_parent_interval()`
   generics have had their signatures tweaked to widen how they can be used. This
