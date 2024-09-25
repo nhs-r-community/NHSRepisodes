@@ -65,6 +65,7 @@
 #'
 # -------------------------------------------------------------------------
 #' @examples
+#' \dontshow{.old <- data.table::setDTthreads(2)}
 #' dat <- data.frame(
 #'     id = c(1, 1, 2, 2, 2, 1),
 #'     start = as.Date(c(
@@ -79,6 +80,7 @@
 #'
 #' with(dat, add_parent_interval(id, start, end))
 #' add_parent_interval(dat, id = "id", start = "start", end = "end")
+#' \dontshow{data.table::setDTthreads(.old)}
 #'
 # -------------------------------------------------------------------------
 #' @export

@@ -91,6 +91,7 @@ data.frame, data.table or tibble).
 interval split by in individual identifier.
 }
 \examples{
+\dontshow{.old <- data.table::setDTthreads(2)}
 dat <- data.frame(
     id = c(1, 1, 2, 2, 2, 1),
     start = as.Date(c(
@@ -105,5 +106,6 @@ dat <- data.frame(
 
 with(dat, merge_episodes(id, start, end))
 merge_episodes(dat, id = "id", start = "start", end = "end")
+\dontshow{data.table::setDTthreads(.old)}
 
 }

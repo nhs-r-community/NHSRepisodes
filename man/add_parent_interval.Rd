@@ -104,6 +104,7 @@ data.frame, data.table or tibble).
 contains overlapping episodes and adds this to the input.
 }
 \examples{
+\dontshow{.old <- data.table::setDTthreads(2)}
 dat <- data.frame(
     id = c(1, 1, 2, 2, 2, 1),
     start = as.Date(c(
@@ -118,5 +119,6 @@ dat <- data.frame(
 
 with(dat, add_parent_interval(id, start, end))
 add_parent_interval(dat, id = "id", start = "start", end = "end")
+\dontshow{data.table::setDTthreads(.old)}
 
 }
