@@ -302,3 +302,86 @@ test_that("merge_episodes (default method) works on a large set of values", {
     expect_identical(out2a, out2b)
 })
 
+
+test_that("merge_episodes as expected for different data frame like objects", {
+
+    id <- c(1, 1, 2, 2, 2, 1)
+
+    start <- as.Date(c(
+        "2020-01-01",
+        "2020-01-03",
+        "2020-04-01",
+        "2020-04-15",
+        "2020-04-17",
+        "2020-05-01"
+    ))
+    end <- as.Date(c(
+        "2020-01-10",
+        "2020-01-10",
+        "2020-04-30",
+        "2020-04-16",
+        "2020-04-19",
+        "2020-10-01"
+    ))
+
+    # Date
+    dat <- data.frame(id = id, start = start, end = end)
+    tbl <- tibble::as_tibble(dat)
+    dt  <- data.table::as.data.table(dat)
+
+    out_dat <- merge_episodes(dat, "id", "start", "end")
+    out_tbl <- merge_episodes(tbl, "id", "start", "end")
+    out_dt  <- merge_episodes( dt, "id", "start", "end")
+
+    # class is maintained
+    expect_identical(class(out_dat), "data.frame")
+    expect_true(tibble::is_tibble(out_tbl))
+    expect_true(data.table::is.data.table(out_dt))
+
+    # All our equal
+    expect_identical(out_dat, as.data.frame(out_tbl))
+    expect_identical(out_dat, as.data.frame(out_dt))
+
+})
+
+
+test_that("add_parent_intervals as expected for different data frame like objects", {
+
+    id <- c(1, 1, 2, 2, 2, 1)
+
+    start <- as.Date(c(
+        "2020-01-01",
+        "2020-01-03",
+        "2020-04-01",
+        "2020-04-15",
+        "2020-04-17",
+        "2020-05-01"
+    ))
+    end <- as.Date(c(
+        "2020-01-10",
+        "2020-01-10",
+        "2020-04-30",
+        "2020-04-16",
+        "2020-04-19",
+        "2020-10-01"
+    ))
+
+    # Date
+    dat <- data.frame(id = id, start = start, end = end)
+    tbl <- tibble::as_tibble(dat)
+    dt  <- data.table::as.data.table(dat)
+
+    out_dat <- add_parent_interval(dat, "id", "start", "end")
+    out_tbl <- add_parent_interval(tbl, "id", "start", "end")
+    out_dt  <- add_parent_interval( dt, "id", "start", "end")
+
+    # class is maintained
+    expect_identical(class(out_dat), "data.frame")
+    expect_true(tibble::is_tibble(out_tbl))
+    expect_true(data.table::is.data.table(out_dt))
+
+    # All our equal
+    expect_identical(out_dat, as.data.frame(out_tbl))
+    expect_identical(out_dat, as.data.frame(out_dt))
+
+})
