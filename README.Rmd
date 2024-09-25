@@ -15,6 +15,12 @@ if (!requireNamespace("ivs", quietly = TRUE)) {
     knitr::knit_exit()
 }
 
+if (!requireNamespace("withr", quietly = TRUE)) {
+    warning(call. = FALSE, "This README requires withr.")
+    knitr::knit_exit()
+}
+
+
 knitr::opts_chunk$set(
     collapse = TRUE,
     comment = "#>",
@@ -53,9 +59,10 @@ To expand on issues consider the following small set of episode data:
 
 ```{r, message=FALSE}
 library(NHSRepisodes)
+library(data.table)
 library(dplyr)
 library(ivs)
-library(data.table)
+library(withr)
 
 # note - we need functionality introduced in dplyr 1.1.0.
 if (getNamespaceVersion("dplyr") < "1.1.0") {
@@ -105,10 +112,12 @@ it becomes noticeably slow for a larger number:
 
 ```{r}
 # Creating a larger data set
-n <- 125000
-id2 <- sample(seq_len(n), size = n * 5, replace = TRUE)
-start2 <- as.Date("2020-01-01") + sample.int(365, size = n * 5, replace = TRUE)
-end2 <- start2 + sample(1:100, size = n * 5, replace = TRUE)
+with_seed(1L, {
+    n <- 125000
+    id2 <- sample(seq_len(n), size = n * 5, replace = TRUE)
+    start2 <- as.Date("2020-01-01") + sample.int(365, size = n * 5, replace = TRUE)
+    end2 <- start2 + sample(1:100, size = n * 5, replace = TRUE)    
+})
 
 # creates the object big_dat and shows the first 10 rows as a tibble in the console
 (big_dat <- tibble(id = id2, start = start2, end = end2))
