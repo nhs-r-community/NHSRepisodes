@@ -125,6 +125,13 @@ merge_episodes.default <- function(
         }
     )
 
+    # Check for duplicate output names before creating the output
+    names <- c(name_id, name_episode_start, name_episode_end, name_episode_number)
+    if (dup <- anyDuplicated(names)) {
+        duplicate <- names[dup]
+        cli_abort("Output names must be unique. {.str {duplicate}} is used multiple times.")
+    }
+
     # use data.table calculate the start and end by id and episode
     setDT(dat)
     dat <- dat[,
@@ -169,7 +176,7 @@ merge_episodes.data.frame <- function(
 
     # add the parent interval
     dat <- tryCatch(
-        add_parent_interval.data.frame(
+        add_parent_interval(
             x = x,
             id = id,
             start = start,
@@ -183,11 +190,29 @@ merge_episodes.data.frame <- function(
         }
     )
 
+    # Check for valid output names before creating the output
+    names <- c(name_episode_start, name_episode_end, name_episode_number)
+    invalid <- names %in% id
+    if (any(invalid)) { # this shouldn't be NA if add_parent_interval has been called first
+        invalid <- names[invalid][1L]
+        cli_abort(
+            "Output names must be unique and not match the {.arg id} argument.
+            {.str {invalid}} is used multiple times."
+        )
+    }
+
+    if (dup <- anyDuplicated(names)) {
+        duplicate <- names[dup]
+        cli_abort("Output names must be unique. {.str {duplicate}} is used multiple times.")
+    }
+
     # use data.table calculate the start and end by id and episode
     setDT(dat)
     dat <- dat[,
                .(episode_start = min(parent_start), episode_end = max(parent_end)),
                by = c(id, name_episode_number)]
+
+
 
     # update names
     setnames(

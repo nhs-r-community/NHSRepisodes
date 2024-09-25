@@ -114,7 +114,6 @@ add_parent_interval.default <- function(
     assert_scalar_character_not_na(name_interval_number)
 
     names <- c(name_id, name_parent_start, name_parent_end, name_interval_number)
-
     if (dup <- anyDuplicated(names)) {
         duplicate <- names[dup]
         cli_abort("Output names must be unique. {.str {duplicate}} is used multiple times.")
@@ -127,15 +126,15 @@ add_parent_interval.default <- function(
         cli_abort("{.arg start} and {.arg end} columns must both be either {.cls Date} or {.cls POSIXct}.")
     }
 
-    # C API NOTE: .calculate_parent is expecting start/end to be REAL so we
-    #             ensure this is the case.
-    storage.mode(start) <- "double"
-    storage.mode(end) <- "double"
-
     # check lengths are compatible
     if (length(id) != length(start) || length(id) != length(end)) {
         cli_abort("{.arg id}, {.arg start} and {.arg end} must be the same length.")
     }
+
+    # C API NOTE: .calculate_parent is expecting start/end to be REAL so we
+    #             ensure this is the case.
+    storage.mode(start) <- "double"
+    storage.mode(end) <- "double"
 
     # C API NOTE: .calculate_parent requires us to be ordered by start date
     #             to work! The key argument here ensures this is the case
@@ -188,7 +187,6 @@ add_parent_interval.data.frame <- function(
     assert_scalar_character_not_na(name_interval_number)
 
     output_names <- c(name_parent_start, name_parent_end, name_interval_number)
-
     if (dup <- anyDuplicated(output_names)) {
         duplicate <- output_names[dup]
         cli_abort("Output names must be unique. {.str {duplicate}} is used multiple times.")
@@ -200,7 +198,7 @@ add_parent_interval.data.frame <- function(
     if (length(matches)) {
         match <- matches[1L]
         cli_abort(
-            "The name {.str {match}} clashes with one of the column names in {.arg x}.
+            "The output name {.str {match}} clashes with one of the column names in {.arg x}.
              Please choose a different name."
         )
     }
