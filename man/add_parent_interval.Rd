@@ -61,10 +61,7 @@ add_parent_interval(...)
 episode.
 
 For the data frame methods. a variable in \code{x} representing the id associated
-with an episode.
-
-Multiple names can be provided in which case the combination of these is used
-as the unique id (akin to a by/group_by approach).}
+with an episode.}
 
 \item{start}{\verb{[character]}.
 

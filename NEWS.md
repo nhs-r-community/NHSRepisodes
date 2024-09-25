@@ -22,11 +22,6 @@ reframe(dat, merge_episodes(id, start, end))
 merge_episodes(dat, "id", "start", "end")
 ```
 
-- For both `merge_episodes()` and `add_parent_interval()`, the `id` argument can
-  now be of length greater than one. In essence this is akin to constructing
-  unique identifiers across multiple variables (I'm unsure if this is useful or
-  not at the moment).
-
 - Input checking and subsequent error signalling has been improved.
 
 # NHSRepisodes 0.1.0

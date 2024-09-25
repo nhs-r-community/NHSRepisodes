@@ -4,7 +4,7 @@
       add_parent_interval(dat)
     Condition
       Error in `add_parent_interval.data.frame()`:
-      ! argument `start` is missing, with no default.
+      ! argument `id` is missing, with no default.
 
 ---
 

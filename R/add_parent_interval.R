@@ -20,9 +20,6 @@
 #' For the data frame methods. a variable in `x` representing the id associated
 #' with an episode.
 #'
-#' Multiple names can be provided in which case the combination of these is used
-#' as the unique id (akin to a by/group_by approach).
-#'
 #' @param start `[character]`.
 #'
 #' For the default method, vector representing episode start date/time.
@@ -182,12 +179,9 @@ add_parent_interval.data.frame <- function(
     check_dots_empty0(...)
 
     # check the input names
+    assert_scalar_character_not_na(id)
     assert_scalar_character_not_na(start)
     assert_scalar_character_not_na(end)
-    assert_character(id)
-    if (anyNA(id)) {
-        cli_abort("{.arg id} must be a non-NA character vector.")
-    }
 
     # check the output names
     assert_scalar_character_not_na(name_parent_start)
@@ -223,20 +217,9 @@ add_parent_interval.data.frame <- function(
         )
     }
 
-    # id vector
-    length_id <- length(id)
-    if (!length_id) {
-        cli_abort("{.arg id} must be of length one or more.")
-    } else if (length_id != 1L) {
-        id <- vec_group_id(x[id])
-    } else {
-        id <- x[[id]]
-    }
-
-    # start vector
+    # pull out the relevant variables
+    id <- x[[id]]
     start <- x[[start]]
-
-    # end vector
     end <- x[[end]]
 
     # calculate the parent intervals
