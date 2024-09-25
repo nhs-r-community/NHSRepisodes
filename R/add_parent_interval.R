@@ -162,7 +162,6 @@ add_parent_interval.default <- function(
 #' @rdname add_parent_interval
 #' @importFrom cli cli_abort
 #' @importFrom rlang check_dots_empty0
-#' @importFrom vctrs vec_group_id
 #' @importFrom ympes assert_scalar_character_not_na assert_character
 #' @export
 add_parent_interval.data.frame <- function(
