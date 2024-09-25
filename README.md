@@ -87,7 +87,7 @@ dat <- tribble(
 #> 8     1 2020-01-11 2020-01-12
 ```
 
-The {ivs} package provides an elegant way to find the minimum spanning
+The ivs package provides an elegant way to find the minimum spanning
 interval across these episodes:
 
 ``` r
@@ -103,13 +103,13 @@ dat |>
 #> 4     2 [2020-04-01, 2020-05-01)
 ```
 
-Note that {ivs} creates intervals that are *right-open* meaning they are
-inclusive on the left (have an opening square bracket `[`) and exclusive
-on the right (with a closing a rounded bracket `)`). Consequently, in
-our first call to `mutate()` we added 1 to the `end` value. This ensures
-that the full range of dates are considered (e.g. for the first row we
-want to consider all days from `2020-01-01` to `2020-01-10` not only up
-until `2020-01-09`).
+Note that `iv()` creates intervals that are *right-open* meaning they
+are inclusive on the left (have an opening square bracket `[`) and
+exclusive on the right (with a closing a rounded bracket `)`).
+Consequently, in our first call to `mutate()` we added 1 to the `end`
+value. This ensures that the full range of dates are considered (for
+example, for the first row we want to consider all days from
+`2020-01-01` to `2020-01-10` not only up until `2020-01-09`).
 
 This works great when we only have a small number of ids to group by.
 However, it becomes noticeably slow for a larger number:
@@ -148,14 +148,14 @@ system.time(
         reframe(interval = iv_groups(interval, abutting = FALSE), .by = id)
 )
 #>    user  system elapsed 
-#>  13.791   0.065  13.921
+#>  13.902   0.065  14.021
 ```
 
 If you were not already using it, this is likely the time you would
-reach for the {data.table} package. Unfortunately the interval class
-created by {ivs} is built upon on the [record type from
+reach for the data.table package. Unfortunately the interval class
+utilised by ivs is built upon on the [record type from
 vctrs](https://vctrs.r-lib.org/reference/new_rcrd.html), and this class
-is not supported in {data.table}:
+is not supported in data.table:
 
 ``` r
 DT <- as.data.table(big_dat)
@@ -175,7 +175,7 @@ fun <- function(s, e) {
 
 system.time(out_dt <- DT[, fun(start, end + 1), by = id])
 #>    user  system elapsed 
-#>  15.385   0.001  15.339
+#>  14.944   0.005  14.915
 ```
 
 ***NHSRepisodes*** solves this with the `merge_episodes()` function:
@@ -200,7 +200,7 @@ merge_episodes(big_dat, id = "id", start = "start", end = "end")
 # And for comparison with earlier timings
 system.time(out <- merge_episodes(big_dat, id = "id", start = "start", end = "end"))
 #>    user  system elapsed 
-#>   0.867   0.000   0.366
+#>   0.831   0.000   0.351
 
 # equal output (subject to ordering)
 out <- out |> 

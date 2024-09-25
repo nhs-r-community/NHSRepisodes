@@ -91,7 +91,7 @@ dat <- tribble(
 (dat <- mutate(dat, across(start:end, as.Date)))
 ```
 
-The {ivs} package provides an elegant way to find the minimum spanning interval 
+The ivs package provides an elegant way to find the minimum spanning interval 
 across these episodes:
 
 ```{r}
@@ -100,7 +100,7 @@ dat |>
     reframe(interval = iv_groups(interval, abutting = FALSE), .by = id)
 ```
 
-Note that {ivs} creates intervals that are *right-open* meaning they are
+Note that `iv()` creates intervals that are *right-open* meaning they are
 inclusive on the left (have an opening square bracket `[`) and exclusive on the
 right (with a closing a rounded bracket `)`). Consequently, in our first call to
 `mutate()` we added 1 to the `end` value. This ensures that the full range of
@@ -132,10 +132,10 @@ system.time(
 ```
 
 If you were not already using it, this is likely the time you would reach for
-the {data.table} package. Unfortunately the interval class created by {ivs} is 
+the data.table package. Unfortunately the interval class utilised by ivs is 
 built upon on the
 [record type from vctrs](https://vctrs.r-lib.org/reference/new_rcrd.html),
-and this class is not supported in {data.table}:
+and this class is not supported in data.table:
 
 ```{r, error=TRUE}
 DT <- as.data.table(big_dat)
