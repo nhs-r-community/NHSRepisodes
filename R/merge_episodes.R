@@ -61,8 +61,7 @@
 #' The resulting combined episode intervals split by id and ordered by interval
 #' number.
 #'
-#' The returned object will be of the same class as the input `x` (i.e. a
-#' data.frame, data.table or tibble).
+#' The returned object will be of the same class as the input `x`.
 #'
 # -------------------------------------------------------------------------
 #' @examples

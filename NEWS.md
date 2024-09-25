@@ -1,7 +1,7 @@
 # NHSRepisodes (development version)
 
 - **BREAKING CHANGE**: `merge_episodes` and `add_parent_interval()` now require
-  column names to be explicitly stated for the data frame methods. I.e. Where,
+  column names to be explicitly stated for the data frame methods. Where,
   in the previous release, `merge_episodes(dat)` would have defaults "id",
   "start" and "end" for the `id`, `start` and `end` arguments, this would now be
   written as `merge_episodes(dat, "id", "start", "end")`.

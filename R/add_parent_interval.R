@@ -60,8 +60,7 @@
 #' The input data with additional columns for the corresponding parent interval
 #' (split across the `id` values).
 #'
-#' The returned object will be of the same class as the input `x` (i.e. a
-#' data.frame, data.table or tibble).
+#' The returned object will be of the same class as the input `x`.
 #'
 # -------------------------------------------------------------------------
 #' @examples

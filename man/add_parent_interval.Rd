@@ -96,8 +96,7 @@ interval in the output.}
 The input data with additional columns for the corresponding parent interval
 (split across the \code{id} values).
 
-The returned object will be of the same class as the input \code{x} (i.e. a
-data.frame, data.table or tibble).
+The returned object will be of the same class as the input \code{x}.
 }
 \description{
 \code{add_parent_interval()} calculates the minimum spanning interval that
