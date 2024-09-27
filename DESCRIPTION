@@ -32,3 +32,4 @@ Suggests:
     tibble
 Config/testthat/edition: 3
 VignetteBuilder: knitr
+URL: https://nhs-r-community.github.io/NHSRepisodes/
