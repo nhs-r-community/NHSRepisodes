@@ -16,6 +16,7 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(NHSRepisodes)
+library(dplyr)
 ```
 
 ## Terminology
@@ -51,7 +52,7 @@ It could also affect counts by days to see `bed occupancy` as one person could a
 There will be many ways around these issues of double counting but the package NHSRepisodes has quick and efficient functions in R that can change or add a column of information on the `episodes` to your data.
 
 ```{r}
-library(tidyverse)
+library(dplyr)
 library(NHSRepisodes)
 
 services <- tibble::tribble(
