@@ -1,0 +1,131 @@
+---
+title: "Hospital episode examples"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Hospital episode examples}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(NHSRepisodes)
+library(dplyr)
+```
+
+## Terminology
+
+### Stays
+
+Hospitals may record data according to `bed stays`, `ward stays` and `in-patient stays` (or episode) as it is used to record how people move around the hospital.
+
+### Entering and leaving hospital
+
+A patient will `attend` something like Accident and Emergency - A&E (also known as Emergency Department or as the acronym ED) and if they stay in hospital that becomes an `admission`. 
+Leaving a hospital from its service (because this can also occur with outpatients where a person isn't admitted to stay for any period) is called `discharge`.
+
+### Journey as recorded in data
+
+Patients can be moved from `beds` in a `ward`, moved between `wards` in a `hospital` and have an overall `in-patient stay` which is how long they were in a hospital.
+
+### Out of area
+
+Some services, like those for mental health, may record a move to another hospital and in the case of mental health will record this as `out of area`.
+Even with all these "stays" the actual time a patient is in the service, or commissioned as part of the service, could all count as one and, if records are from different systems, may either overlap or not join together.
+
+For example, if a mental health patient is in a local service, then moves, a gap of a day or two is most likely to be an administrative error.
+An example of this delay could be because a patient is moved from one hospital on the Sunday but the recording takes place on the Monday or even the Tuesday if the Monday is a public holiday.
+In order to record the move the patient will be `discharged` although, in actuality they are still in healthcare services.
+
+## Using NHSRepisodes
+
+It may be that an analyst has access to all the data related to a stay in hospital, so beds, ward, overall stay in something like a SQL warehouse and in that case it's very likely that the dates are reasonably accurate. 
+However, if there is any overlapping in any of the data this will affect overall counts because the one stay could look like two or more entries.
+It could also affect counts by days to see `bed occupancy` as one person could appear twice and so be double counted.
+
+There will be many ways around these issues of double counting but the package NHSRepisodes has quick and efficient functions in R that can change or add a column of information on the `episodes` to your data.
+
+```{r}
+library(dplyr)
+library(NHSRepisodes)
+
+services <- tibble::tribble(
+  ~code, ~service, ~type,
+  "t100", "service A", "inpatient",
+  "t200", "service B", "inpatient",
+  "t500", "service C", "inpatient",
+  "t600", "service D", "out of area"
+)
+
+# Create a dummy data set give the first and last dates of an episode
+# using withr package to
+
+dat <- tribble(
+  ~patient_id, ~admission, ~discharge, ~code, ~notes,
+  1L, "2020-01-01", "2020-01-10", "t100", NA,
+  1L, "2020-01-12", "2020-01-22", "t600", "this has a gap",
+  # 2L, "2020-04-01", "2020-04-30", "t100", NA,
+  # 2L, "2020-04-15", "2020-04-16", "t200", NA,
+  # 2L, "2020-04-17", "2020-04-19", "t500", NA,
+  1L, "2020-05-01", "2020-10-01", "t100", NA,
+  1L, "2020-10-01", "2020-11-01", "t600", "same day overlap"
+) |>
+  # columns must be date format to work with NHSRepisodes functions
+  mutate(across(admission:discharge, as.Date)) |>
+  left_join(services) |>
+  arrange(patient_id, admission)
+```
+
+Find the episodes and add a column to the data:
+
+```{r}
+dat |>
+  # Rename the columns so that they are recognised by the `add_parent_interval()` function
+  select(
+    id = patient_id,
+    start = admission,
+    end = discharge,
+    everything()
+  ) |>
+  NHSRepisodes::add_parent_interval()
+```
+
+Because this patient had a gap of a few days between and inpatient and out of area stay this appears, currently, as two intervals (episodes).
+
+To adjust this add days to the discharge (end) column according to what is appropriate for the data. 
+
+```{r}
+dat |>
+  # Rename the columns so that they are recognised by the `add_parent_interval()` function
+  select(
+    id = patient_id,
+    start = admission,
+    end_actual = discharge,
+    everything()
+  ) |>
+  mutate(end = end_actual + 2) |>
+  NHSRepisodes::add_parent_interval()
+```
+
+Rather than adding a column to the data, it is possible to use the function `merge_episodes()` to return one row for each episode.
+Using the last example where days were added to the end (discharge) to close an out of area gap:
+
+```{r}
+dat |>
+  # Rename the columns so that they are recognised by the `add_parent_interval()` function
+  select(
+    id = patient_id,
+    start = admission,
+    end_actual = discharge,
+    everything()
+  ) |>
+  mutate(end = end_actual + 2) |>
+  NHSRepisodes::merge_episodes()
+```
+
