@@ -240,3 +240,13 @@ add_parent_interval(dat)
 #> 7     1 2020-01-01 2020-01-10 2020-01-01    2020-01-10                 1
 #> 8     1 2020-01-11 2020-01-12 2020-01-11    2020-01-12                 2
 ```
+## Contributors
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
