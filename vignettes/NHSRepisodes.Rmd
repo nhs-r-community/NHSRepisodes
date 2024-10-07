@@ -10,7 +10,8 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  message = FALSE
 )
 ```
 
@@ -70,9 +71,6 @@ dat <- tribble(
   ~patient_id, ~admission, ~discharge, ~code, ~notes,
   1L, "2020-01-01", "2020-01-10", "t100", NA,
   1L, "2020-01-12", "2020-01-22", "t600", "this has a gap",
-  # 2L, "2020-04-01", "2020-04-30", "t100", NA,
-  # 2L, "2020-04-15", "2020-04-16", "t200", NA,
-  # 2L, "2020-04-17", "2020-04-19", "t500", NA,
   1L, "2020-05-01", "2020-10-01", "t100", NA,
   1L, "2020-10-01", "2020-11-01", "t600", "same day overlap"
 ) |>
@@ -93,7 +91,13 @@ dat |>
     end = discharge,
     everything()
   ) |>
-  NHSRepisodes::add_parent_interval()
+  NHSRepisodes::add_parent_interval() |> 
+    select(id,
+           start,
+           end,
+           .parent_start,
+           .parent_end,
+           .interval_number)
 ```
 
 Because this patient had a gap of a few days between and inpatient and out of area stay this appears, currently, as two intervals (episodes).
@@ -110,7 +114,13 @@ dat |>
     everything()
   ) |>
   mutate(end = end_actual + 2) |>
-  NHSRepisodes::add_parent_interval()
+  NHSRepisodes::add_parent_interval() |> 
+    select(id,
+           start,
+           end,
+           .parent_start,
+           .parent_end,
+           .interval_number)
 ```
 
 Rather than adding a column to the data, it is possible to use the function `merge_episodes()` to return one row for each episode.
