@@ -1,4 +1,22 @@
 {
   "projectName": "NHSRepisodes",
-  "projectOwner": "nhs-r-community"
+  "projectOwner": "nhs-r-community",
+  "files": [
+    "README.md"
+  ],
+  "commitType": "docs",
+  "commitConvention": "angular",
+  "contributorsPerLine": 7,
+  "contributors": [
+    {
+      "login": "TimTaylor",
+      "name": "Tim Taylor",
+      "avatar_url": "https://avatars.githubusercontent.com/u/43499035?v=4",
+      "profile": "https://github.com/TimTaylor",
+      "contributions": [
+        "doc",
+        "test"
+      ]
+    }
+  ]
 }
