@@ -20,6 +20,9 @@ with:
 remotes::install_github("https://github.com/nhs-r-community/NHSRepisodes")
 ```
 
+To find out more about the functions there is a vignetted for [getting
+started](https://nhs-r-community.github.io/NHSRepisodes/articles/NHSRepisodes.html).
+
 ## Motivation
 
 ***NHSRepisodes*** is a (hopefully) temporary solution to a small
