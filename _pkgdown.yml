@@ -1,4 +1,8 @@
 url: https://nhs-r-community.github.io/NHSRepisodes/
 template:
   bootstrap: 5
-
+  light-switch: true
+navbar:
+  structure:
+    left:  [intro, reference, articles, news]
+    right: [search, github, lightswitch]
