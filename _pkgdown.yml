@@ -2,7 +2,8 @@ url: https://nhs-r-community.github.io/NHSRepisodes/
 template:
   bootstrap: 5
   light-switch: true
-navbar:
-  structure:
-    left:  [intro, reference, articles, news]
-    right: [search, github, lightswitch]
+  bslib:
+    primary: "#0054AD"
+    border-radius: 0.5rem
+    btn-border-radius: 0.25rem
+    danger: "#A6081A"

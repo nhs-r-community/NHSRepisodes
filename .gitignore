@@ -53,3 +53,5 @@ rsconnect/
 *.so
 inst/doc
 docs
+
+!.all-contributorsrc
