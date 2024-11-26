@@ -1,7 +1,11 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# NHSRepisodes
+# NHSRepisodes <img src="https://raw.githubusercontent.com/nhs-r-community/NHSRepisodes/main/inst/images/nhsrepisodeslogo.png" width="120" align = "right" alt = "NHSRepisodeslogo"/>
+
+<a href='https://nhsrcommunity.com/'><img src='https://nhs-r-community.github.io/assets/logo/nhsr-logo.png' width="100"/></a>
+*This package is part of the NHS-R Community suite of [R
+packages](https://nhsrcommunity.com/packages.html).*
 
 <!-- badges: start -->
 
@@ -44,6 +48,7 @@ To expand on issues consider the following small set of episode data:
 library(NHSRepisodes)
 library(dplyr)
 library(ivs)
+#> Warning: package 'ivs' was built under R version 4.4.2
 library(data.table)
 
 # note - we need functionality introduced in dplyr 1.1.0.
@@ -60,7 +65,7 @@ mutate(tibble(packages), version = sapply(packages, getNamespaceVersion))
 #>   <chr>        <chr>     
 #> 1 NHSRepisodes 0.1.0.9000
 #> 2 dplyr        1.1.4     
-#> 3 data.table   1.16.0    
+#> 3 data.table   1.15.4    
 #> 4 ivs          0.2.0
 
 # Create a dummy data set give the first and last dates of an episode
@@ -130,16 +135,16 @@ end2 <- start2 + sample(1:100, size = n * 5, replace = TRUE)
 #> # A tibble: 625,000 × 3
 #>        id start      end       
 #>     <int> <date>     <date>    
-#>  1  47215 2020-12-29 2021-02-16
-#>  2  91739 2020-09-16 2020-11-12
-#>  3 114791 2020-01-31 2020-02-27
-#>  4  83644 2020-08-17 2020-11-04
-#>  5  68824 2020-02-14 2020-05-06
-#>  6 100194 2020-12-11 2021-03-18
-#>  7   3871 2020-06-21 2020-07-06
-#>  8 118901 2020-01-09 2020-03-23
-#>  9  80676 2020-07-23 2020-08-19
-#> 10  84580 2020-07-17 2020-10-07
+#>  1  44036 2020-06-28 2020-09-08
+#>  2 118108 2020-08-21 2020-11-25
+#>  3 105138 2020-02-18 2020-04-05
+#>  4  15354 2020-04-05 2020-05-28
+#>  5 100751 2020-01-12 2020-03-05
+#>  6  99591 2020-02-05 2020-04-12
+#>  7  58097 2020-11-12 2020-12-02
+#>  8  37685 2020-06-17 2020-08-19
+#>  9 109675 2020-03-05 2020-04-27
+#> 10 117425 2020-09-22 2020-11-24
 #> # ℹ 624,990 more rows
 
 # checking the time to run
@@ -150,7 +155,7 @@ system.time(
         reframe(interval = iv_groups(interval, abutting = FALSE), .by = id)
 )
 #>    user  system elapsed 
-#>   17.00    0.28   17.30
+#>   34.58    0.47   37.60
 ```
 
 If you were not already using it, this is likely the time you would
@@ -177,32 +182,32 @@ fun <- function(s, e) {
 
 system.time(out_dt <- DT[, fun(start, end + 1), by = id])
 #>    user  system elapsed 
-#>   19.26    0.49   19.77
+#>   32.74    0.61   33.84
 ```
 
 ***NHSRepisodes*** solves this with the `merge_episodes()` function:
 
 ``` r
 merge_episodes(big_dat)
-#> # A tibble: 335,828 × 4
+#> # A tibble: 336,162 × 4
 #>       id .interval_number .episode_start .episode_end
 #>    <int>            <int> <date>         <date>      
-#>  1     1                1 2020-01-15     2020-01-27  
-#>  2     1                2 2020-02-13     2020-11-14  
-#>  3     1                3 2020-11-15     2021-02-13  
-#>  4     2                1 2020-01-03     2020-03-25  
-#>  5     2                2 2020-03-31     2020-06-09  
-#>  6     2                3 2020-10-31     2020-11-08  
-#>  7     2                4 2020-12-17     2021-01-23  
-#>  8     3                1 2020-03-08     2020-03-19  
-#>  9     3                2 2020-04-13     2020-05-26  
-#> 10     3                3 2020-11-30     2020-12-01  
-#> # ℹ 335,818 more rows
+#>  1     1                1 2020-01-16     2020-03-26  
+#>  2     1                2 2020-07-13     2020-09-30  
+#>  3     1                3 2020-11-18     2020-11-26  
+#>  4     1                4 2020-12-14     2021-02-20  
+#>  5     2                1 2020-03-08     2020-04-23  
+#>  6     2                2 2020-06-06     2020-07-09  
+#>  7     2                3 2020-09-16     2020-11-03  
+#>  8     2                4 2020-11-07     2020-11-18  
+#>  9     2                5 2020-11-19     2021-01-22  
+#> 10     3                1 2020-01-10     2020-04-19  
+#> # ℹ 336,152 more rows
 
 # And for comparison with earlier timings
 system.time(out <- merge_episodes(big_dat))
 #>    user  system elapsed 
-#>    0.59    0.11    0.44
+#>    0.75    0.00    0.70
 
 # equal output (subject to ordering)
 out <- out |> 
@@ -246,19 +251,13 @@ add_parent_interval(dat)
 ## Contributors
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+
 <!-- prettier-ignore-start -->
+
 <!-- markdownlint-disable -->
-<table>
-  <tbody>
-    <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/TimTaylor"><img src="https://avatars.githubusercontent.com/u/43499035?v=4?s=100" width="100px;" alt="Tim Taylor"/><br /><sub><b>Tim Taylor</b></sub></a><br /><a href="#doc-TimTaylor" title="Documentation">📖</a> <a href="#test-TimTaylor" title="Tests">⚠️</a> <a href="#code-TimTaylor" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://philosopher-analyst.netlify.app/"><img src="https://avatars.githubusercontent.com/u/39963221?v=4?s=100" width="100px;" alt="Zoë Turner"/><br /><sub><b>Zoë Turner</b></sub></a><br /><a href="#doc-Lextuga007" title="Documentation">📖</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://publichealthscotland.scot/"><img src="https://avatars.githubusercontent.com/u/5982260?v=4?s=100" width="100px;" alt="James McMahon"/><br /><sub><b>James McMahon</b></sub></a><br /><a href="#ideas-Moohan" title="Ideas, Planning, & Feedback">🤔</a></td>
-    </tr>
-  </tbody>
-</table>
 
 <!-- markdownlint-restore -->
+
 <!-- prettier-ignore-end -->
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
