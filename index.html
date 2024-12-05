@@ -55,8 +55,9 @@
 </nav><div class="container template-home">
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
-<div class="page-header"><h1 id="nhsrepisodes">NHSRepisodes<a class="anchor" aria-label="anchor" href="#nhsrepisodes"></a>
+<div class="page-header"><h1 id="nhsrepisodes-">NHSRepisodes <img src="https://raw.githubusercontent.com/nhs-r-community/NHSRepisodes/main/inst/images/nhsrepisodeslogo.png" width="120" align="right" alt="NHSRepisodeslogo"><a class="anchor" aria-label="anchor" href="#nhsrepisodes-"></a>
 </h1></div>
+<p><a href="https://nhsrcommunity.com/" class="external-link"><img src="https://nhs-r-community.github.io/assets/logo/nhsr-logo.png" width="100"></a> <em>This package is part of the NHS-R Community suite of <a href="https://nhsrcommunity.com/packages.html" class="external-link">R packages</a>.</em></p>
 <!-- badges: start -->
 
 <div class="section level2">
@@ -77,6 +78,7 @@
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://nhs-r-community.github.io/NHSRepisodes/">NHSRepisodes</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/DavisVaughan/ivs" class="external-link">ivs</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: package 'ivs' was built under R version 4.4.2</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-datatable.com" class="external-link">data.table</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># note - we need functionality introduced in dplyr 1.1.0.</span></span>
@@ -93,7 +95,7 @@
 <span><span class="co">#&gt;   &lt;chr&gt;        &lt;chr&gt;     </span></span>
 <span><span class="co">#&gt; 1 NHSRepisodes 0.1.0.9000</span></span>
 <span><span class="co">#&gt; 2 dplyr        1.1.4     </span></span>
-<span><span class="co">#&gt; 3 data.table   1.16.0    </span></span>
+<span><span class="co">#&gt; 3 data.table   1.15.4    </span></span>
 <span><span class="co">#&gt; 4 ivs          0.2.0</span></span>
 <span></span>
 <span><span class="co"># Create a dummy data set give the first and last dates of an episode</span></span>
@@ -148,16 +150,16 @@
 <span><span class="co">#&gt; # A tibble: 625,000 × 3</span></span>
 <span><span class="co">#&gt;        id start      end       </span></span>
 <span><span class="co">#&gt;     &lt;int&gt; &lt;date&gt;     &lt;date&gt;    </span></span>
-<span><span class="co">#&gt;  1  47215 2020-12-29 2021-02-16</span></span>
-<span><span class="co">#&gt;  2  91739 2020-09-16 2020-11-12</span></span>
-<span><span class="co">#&gt;  3 114791 2020-01-31 2020-02-27</span></span>
-<span><span class="co">#&gt;  4  83644 2020-08-17 2020-11-04</span></span>
-<span><span class="co">#&gt;  5  68824 2020-02-14 2020-05-06</span></span>
-<span><span class="co">#&gt;  6 100194 2020-12-11 2021-03-18</span></span>
-<span><span class="co">#&gt;  7   3871 2020-06-21 2020-07-06</span></span>
-<span><span class="co">#&gt;  8 118901 2020-01-09 2020-03-23</span></span>
-<span><span class="co">#&gt;  9  80676 2020-07-23 2020-08-19</span></span>
-<span><span class="co">#&gt; 10  84580 2020-07-17 2020-10-07</span></span>
+<span><span class="co">#&gt;  1  44036 2020-06-28 2020-09-08</span></span>
+<span><span class="co">#&gt;  2 118108 2020-08-21 2020-11-25</span></span>
+<span><span class="co">#&gt;  3 105138 2020-02-18 2020-04-05</span></span>
+<span><span class="co">#&gt;  4  15354 2020-04-05 2020-05-28</span></span>
+<span><span class="co">#&gt;  5 100751 2020-01-12 2020-03-05</span></span>
+<span><span class="co">#&gt;  6  99591 2020-02-05 2020-04-12</span></span>
+<span><span class="co">#&gt;  7  58097 2020-11-12 2020-12-02</span></span>
+<span><span class="co">#&gt;  8  37685 2020-06-17 2020-08-19</span></span>
+<span><span class="co">#&gt;  9 109675 2020-03-05 2020-04-27</span></span>
+<span><span class="co">#&gt; 10 117425 2020-09-22 2020-11-24</span></span>
 <span><span class="co">#&gt; # ℹ 624,990 more rows</span></span>
 <span></span>
 <span><span class="co"># checking the time to run</span></span>
@@ -168,7 +170,7 @@
 <span>        <span class="fu"><a href="https://dplyr.tidyverse.org/reference/reframe.html" class="external-link">reframe</a></span><span class="op">(</span>interval <span class="op">=</span> <span class="fu"><a href="https://davisvaughan.github.io/ivs/reference/iv-groups.html" class="external-link">iv_groups</a></span><span class="op">(</span><span class="va">interval</span>, abutting <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>, .by <span class="op">=</span> <span class="va">id</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   17.00    0.28   17.30</span></span></code></pre></div>
+<span><span class="co">#&gt;   34.58    0.47   37.60</span></span></code></pre></div>
 <p>If you were not already using it, this is likely the time you would reach for the {data.table} package. Unfortunately the interval class created by {ivs} is built upon on the <a href="https://vctrs.r-lib.org/reference/new_rcrd.html" class="external-link">record type from vctrs</a>, and this class is not supported in {data.table}:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">DT</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/data.table/man/as.data.table.html" class="external-link">as.data.table</a></span><span class="op">(</span><span class="va">big_dat</span><span class="op">)</span></span>
@@ -184,29 +186,29 @@
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">out_dt</span> <span class="op">&lt;-</span> <span class="va">DT</span><span class="op">[</span>, <span class="fu">fun</span><span class="op">(</span><span class="va">start</span>, <span class="va">end</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span>, by <span class="op">=</span> <span class="va">id</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   19.26    0.49   19.77</span></span></code></pre></div>
+<span><span class="co">#&gt;   32.74    0.61   33.84</span></span></code></pre></div>
 <p><strong><em>NHSRepisodes</em></strong> solves this with the <code><a href="reference/merge_episodes.html">merge_episodes()</a></code> function:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/merge_episodes.html">merge_episodes</a></span><span class="op">(</span><span class="va">big_dat</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 335,828 × 4</span></span>
+<span><span class="co">#&gt; # A tibble: 336,162 × 4</span></span>
 <span><span class="co">#&gt;       id .interval_number .episode_start .episode_end</span></span>
 <span><span class="co">#&gt;    &lt;int&gt;            &lt;int&gt; &lt;date&gt;         &lt;date&gt;      </span></span>
-<span><span class="co">#&gt;  1     1                1 2020-01-15     2020-01-27  </span></span>
-<span><span class="co">#&gt;  2     1                2 2020-02-13     2020-11-14  </span></span>
-<span><span class="co">#&gt;  3     1                3 2020-11-15     2021-02-13  </span></span>
-<span><span class="co">#&gt;  4     2                1 2020-01-03     2020-03-25  </span></span>
-<span><span class="co">#&gt;  5     2                2 2020-03-31     2020-06-09  </span></span>
-<span><span class="co">#&gt;  6     2                3 2020-10-31     2020-11-08  </span></span>
-<span><span class="co">#&gt;  7     2                4 2020-12-17     2021-01-23  </span></span>
-<span><span class="co">#&gt;  8     3                1 2020-03-08     2020-03-19  </span></span>
-<span><span class="co">#&gt;  9     3                2 2020-04-13     2020-05-26  </span></span>
-<span><span class="co">#&gt; 10     3                3 2020-11-30     2020-12-01  </span></span>
-<span><span class="co">#&gt; # ℹ 335,818 more rows</span></span>
+<span><span class="co">#&gt;  1     1                1 2020-01-16     2020-03-26  </span></span>
+<span><span class="co">#&gt;  2     1                2 2020-07-13     2020-09-30  </span></span>
+<span><span class="co">#&gt;  3     1                3 2020-11-18     2020-11-26  </span></span>
+<span><span class="co">#&gt;  4     1                4 2020-12-14     2021-02-20  </span></span>
+<span><span class="co">#&gt;  5     2                1 2020-03-08     2020-04-23  </span></span>
+<span><span class="co">#&gt;  6     2                2 2020-06-06     2020-07-09  </span></span>
+<span><span class="co">#&gt;  7     2                3 2020-09-16     2020-11-03  </span></span>
+<span><span class="co">#&gt;  8     2                4 2020-11-07     2020-11-18  </span></span>
+<span><span class="co">#&gt;  9     2                5 2020-11-19     2021-01-22  </span></span>
+<span><span class="co">#&gt; 10     3                1 2020-01-10     2020-04-19  </span></span>
+<span><span class="co">#&gt; # ℹ 336,152 more rows</span></span>
 <span></span>
 <span><span class="co"># And for comparison with earlier timings</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/merge_episodes.html">merge_episodes</a></span><span class="op">(</span><span class="va">big_dat</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;    0.59    0.11    0.44</span></span>
+<span><span class="co">#&gt;    0.75    0.00    0.70</span></span>
 <span></span>
 <span><span class="co"># equal output (subject to ordering)</span></span>
 <span><span class="va">out</span> <span class="op">&lt;-</span> <span class="va">out</span> <span class="op">|&gt;</span> </span>
@@ -247,18 +249,9 @@
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
-<table class="table"><tbody><tr>
-<td align="center" valign="top" width="14.28%">
-<a href="https://github.com/TimTaylor" class="external-link"><img src="https://avatars.githubusercontent.com/u/43499035?v=4?s=100" width="100px;" alt="Tim Taylor"><br><sub><b>Tim Taylor</b></sub></a><br><a href="#doc-TimTaylor" title="Documentation">📖</a> <a href="#test-TimTaylor" title="Tests">⚠️</a> <a href="#code-TimTaylor" title="Code">💻</a>
-</td>
-<td align="center" valign="top" width="14.28%">
-<a href="https://philosopher-analyst.netlify.app/" class="external-link"><img src="https://avatars.githubusercontent.com/u/39963221?v=4?s=100" width="100px;" alt="Zoë Turner"><br><sub><b>Zoë Turner</b></sub></a><br><a href="#doc-Lextuga007" title="Documentation">📖</a>
-</td>
-<td align="center" valign="top" width="14.28%">
-<a href="https://publichealthscotland.scot/" class="external-link"><img src="https://avatars.githubusercontent.com/u/5982260?v=4?s=100" width="100px;" alt="James McMahon"><br><sub><b>James McMahon</b></sub></a><br><a href="#ideas-Moohan" title="Ideas, Planning, &amp; Feedback">🤔</a>
-</td>
-</tr></tbody></table>
-<!-- markdownlint-restore --><!-- prettier-ignore-end --><!-- ALL-CONTRIBUTORS-LIST:END -->
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+<!-- ALL-CONTRIBUTORS-LIST:END -->
 </div>
 </div>
   </main><aside class="col-md-3"><div class="license">
