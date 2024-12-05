@@ -3,7 +3,7 @@ pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   NHSRepisodes: NHSRepisodes.html
-last_built: 2024-11-15T13:45Z
+last_built: 2024-12-05T10:50Z
 urls:
   reference: https://nhs-r-community.github.io/NHSRepisodes/reference
   article: https://nhs-r-community.github.io/NHSRepisodes/articles
