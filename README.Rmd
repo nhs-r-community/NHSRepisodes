@@ -24,10 +24,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# NHSRepisodes <img src="https://raw.githubusercontent.com/nhs-r-community/NHSRepisodes/main/inst/images/nhsrepisodeslogo.png" width="120" align = "right" alt = "NHSRepisodeslogo"/>
-
-<a href='https://nhsrcommunity.com/'><img src='https://nhs-r-community.github.io/assets/logo/nhsr-logo.png' width="100"/></a> *This package is part of the NHS-R Community suite of [R packages](https://nhsrcommunity.com/packages.html).*
-
+# NHSRepisodes
 
 <!-- badges: start -->
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
